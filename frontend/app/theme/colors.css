@@ -1,0 +1,14 @@
+:root {
+    --primary: #007AFF;
+    --background: #1E1E1E;
+    --contenct: #2C2C2C;
+    --header: #252525;
+    --block: #272727;
+    --info: #232323;
+    --text: #fff;
+    --textInv: #000;
+    --floating: #363636;
+    --pause: #E7BA60;
+    --resume: #B0E675;
+    --stop: #E55B5B;
+  }

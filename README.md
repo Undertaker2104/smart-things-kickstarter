@@ -82,3 +82,12 @@ npm run build
 cd ../../
 docker compose up -d --build
 ````
+
+
+VOOR MAC
+--------
+
+Colima start:
+
+colima start
+npm run dev
