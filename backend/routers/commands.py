@@ -79,7 +79,7 @@ def ack_command(command_id: int, body: CommandAckReq):
             )
             if cur.rowcount == 0:
                 raise HTTPException(
-                    status_code=404, 
+                    status_code=404,
                     detail="Command not found for device"
                 )
         conn.commit()
