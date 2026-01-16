@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import './BottomBar.css'
 import '../theme/colors.css'
 import StatusIcon from "../assets/icons/status.svg"
