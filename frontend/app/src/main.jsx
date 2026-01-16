@@ -6,7 +6,7 @@ import BottomBar from './components/BottomBar.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BottomBar />
     <App />
+    <BottomBar />
   </StrictMode>,
 )
