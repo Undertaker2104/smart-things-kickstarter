@@ -1,5 +1,5 @@
 """Session endpoints for ESP to API communication."""
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Query
 
 from database import get_db_connection
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 @router.post("/start")
 def start_session(body: StartSessionReq):
     """Start a new cleaning session."""
-    started_at = body.startedAt or datetime.utcnow().isoformat()
+    started_at = body.startedAt or datetime.now(timezone.utc).isoformat()
 
     with get_db_connection() as conn:
         with conn.cursor() as cur:
@@ -65,7 +65,7 @@ def upsert_session_item(session_id: int, body: ItemUpsertReq):
 @router.post("/{session_id}/events")
 def add_event(session_id: int, body: EventCreateReq):
     """Add an event to a session."""
-    timestamp = body.timestamp or datetime.utcnow().isoformat()
+    timestamp = body.timestamp or datetime.now(timezone.utc).isoformat()
 
     with get_db_connection() as conn:
         with conn.cursor() as cur:
@@ -90,7 +90,7 @@ def add_event(session_id: int, body: EventCreateReq):
 @router.post("/{session_id}/stop")
 def stop_session(session_id: int, body: StopSessionReq):
     """Stop a cleaning session."""
-    ended_at = body.endedAt or datetime.utcnow().isoformat()
+    ended_at = body.endedAt or datetime.now(timezone.utc).isoformat()
 
     with get_db_connection() as conn:
         with conn.cursor() as cur:
