@@ -3,7 +3,7 @@
   bottom: 0;
   left: 50%;           /* start from center */
   transform: translateX(-50%); /* shift back by half width to center */
-  width: 45%;          /* now bar is 60% of screen width */
+  width: 45%;          /* now bar is 45% of screen width */
   height: 110px;
   background-color: var(--header);
   display: flex;
