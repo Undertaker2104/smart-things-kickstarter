@@ -19,7 +19,7 @@
 /* Container to hold all buttons and space them */
 .btm-buttons-container {
   display: flex;
-  gap: 100px; /* <-- easy-to-tweak spacing between buttons */
+  gap: 130px; /* <-- easy-to-tweak spacing between buttons */
 }
 
 /* Individual buttons */
