@@ -1,6 +1,8 @@
 # smart-things-kickstarter
 Kickstarter github
 
+BACKEND
+-----------
 Om het project te starten:
 ````
 docker compose up -d
@@ -58,7 +60,8 @@ Docker:
 npm run build
 ````
 
-GEZAMELIJK
+GEZAMENLIJK
+-------------
 Eerst:
 ````
 cd frontend/app
