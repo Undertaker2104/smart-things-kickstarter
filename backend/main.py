@@ -5,9 +5,10 @@ from routers import commands, sessions, state
 
 app = FastAPI(
     title="Ball Cleaner API",
-    description="API for managing ball cleaning sessions and device commands",
-    version="1.0.0"
+    docs_url="/api/docs",
+    openapi_url="/api/openapi.json",
 )
+
 
 # Include routers
 app.include_router(commands.router)
