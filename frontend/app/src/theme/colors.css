@@ -1,10 +1,12 @@
 :root {
     --primary: #007AFF;
     --background: #1E1E1E;
-    --contenct: #2C2C2C;
+    --content: #2C2C2C;
     --header: #252525;
     --block: #272727;
     --info: #232323;
+    --hover: #444;
+    --current: #333333;
     --text: #fff;
     --textInv: #000;
     --floating: #363636;
