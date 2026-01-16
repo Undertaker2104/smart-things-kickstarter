@@ -91,3 +91,26 @@ Colima start:
 
 colima start
 npm run dev
+
+DATABASE
+----------------
+Ga naar http://localhost:5050
+
+Inlog gegevens:
+````c
+admin@local.dev
+admin
+````
+
+Opzetten (na inloggen):
+````
+1. Add New Server
+2. Tab General
+3. Name: BallCleaner DB
+4. Tab Connection
+5. Host name / address: db
+6. Port: 5432
+7. Username: app
+8. Password: app_pw
+9. Database: ballcleaner
+````
