@@ -5,6 +5,8 @@ from routers import commands, sessions, state
 
 app = FastAPI(
     title="Ball Cleaner API",
+    description="Ball Cleaner API - Main application entry point.",
+    version="1.0.0",
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
 )
