@@ -1,0 +1,55 @@
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;           /* start from center */
+  transform: translateX(-50%); /* shift back by half width to center */
+  width: 45%;          /* now bar is 60% of screen width */
+  height: 110px;
+  background-color: var(--header);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+  z-index: 1000;
+  padding: 0 10px;
+  border-radius: 10px 10px 0px 0px; /* optional, makes the bar look nicer */
+}
+
+/* Container to hold all buttons and space them */
+.btm-buttons-container {
+  display: flex;
+  gap: 100px; /* <-- easy-to-tweak spacing between buttons */
+}
+
+/* Individual buttons */
+.btmBut {
+  display: flex;
+  flex-direction: column; /* icon on top, label below */
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 80px;   /* fixed width */
+  height: 80px;  /* fixed height */
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 15px;
+  flex-shrink: 0; /* ensures buttons don’t shrink */
+}
+
+.btmBut:hover {
+  background-color: var(--hover);
+}
+
+.btmBut .icon {
+  width: 30px;
+  height: 30px;
+  fill: white;
+}
+
+.btmBut .label {
+  font-size: 15px;
+  text-align: center;
+}
