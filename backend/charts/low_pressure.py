@@ -1,5 +1,6 @@
 import plotly.graph_objects as go
 from database import get_db_connection
+from psycopg.sql import SQL, Literal
 
 
 def create_low_pressure_chart(days=7):
@@ -11,17 +12,18 @@ def create_low_pressure_chart(days=7):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             # Count LOW_PRESSURE events per ball type by parsing details field
-            cur.execute(f"""
+            query = SQL("""
                 SELECT 
                     bt.name as ball_type,
                     COUNT(el.id) as low_pressure_count
                 FROM ball_type bt
                 LEFT JOIN event_log el ON el.details LIKE bt.name || '%' 
                     AND el.code = 'LOW_PRESSURE'
-                    AND el.timestamp >= NOW() - INTERVAL '{days + 1} days'
+                    AND el.timestamp >= NOW() - INTERVAL {} || ' days'
                 GROUP BY bt.id, bt.name
                 ORDER BY bt.id
-            """)
+            """).format(Literal(str(days)))
+            cur.execute(query)
             results = cur.fetchall()
     
     # Prepare data
@@ -33,7 +35,7 @@ def create_low_pressure_chart(days=7):
         counts.append(row['low_pressure_count'])
     
     # Create bar chart
-    colors = {'Basketbal': '#FF6B6B', 'Voetbal': '#4ECDC4', 'Volleybal': '#FFE66D'}
+    colors = {'Basketbal': '#e79426', 'Voetbal': '#4619ee', 'Volleybal': '#dbce18'}
     bar_colors = [colors.get(bt, '#999') for bt in ball_types]
     
     fig = go.Figure(data=[

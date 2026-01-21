@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException
 
 from database import get_db_connection
-from models import CommandCreateReq
+from models import CommandCreateReq, CommandFailedReq
 
 router = APIRouter(prefix="/api/commands", tags=["commands"])
 
@@ -84,8 +84,8 @@ def mark_command_success(command_id: int):
 
 
 @router.post("/{command_id}/failed")
-def mark_command_failed(command_id: int, error_message: str = ""):
-    """Mark command as failed with optional error message."""
+def mark_command_failed(command_id: int, body: CommandFailedReq):
+    """Mark command as failed with optional error message (max 500 chars)."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -95,7 +95,7 @@ def mark_command_failed(command_id: int, error_message: str = ""):
                 WHERE id = %s AND command_status = 'CLAIMED'
                 RETURNING id, type, command_status, error_message
                 """,
-                (error_message, command_id),
+                (body.error_message, command_id),
             )
             cmd = cur.fetchone()
             if not cmd:

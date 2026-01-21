@@ -16,13 +16,14 @@ def create_expected_vs_counted_chart():
                     bt.id,
                     bt.name,
                     COALESCE(ie.expected_count, 0) as expected_count,
-                    COALESCE(SUM(si.count), 0) as total_counted
+                    COALESCE(si.count, 0) as total_counted
                 FROM ball_type bt
                 LEFT JOIN inventory_expected ie ON bt.id = ie.ball_type_id
-                LEFT JOIN session_item si ON bt.id = si.ball_type_id
-                LEFT JOIN cleaning_session cs ON si.session_id = cs.id
-                WHERE cs.id = (SELECT MAX(id) FROM cleaning_session)
-                GROUP BY bt.id, bt.name, ie.expected_count
+                LEFT JOIN (
+                    SELECT si.ball_type_id, si.count
+                    FROM session_item si
+                    WHERE si.session_id = (SELECT MAX(id) FROM cleaning_session)
+                ) si ON bt.id = si.ball_type_id
                 ORDER BY bt.id
             """)
             results = cur.fetchall()

@@ -14,6 +14,10 @@ class CommandCreateReq(BaseModel):
     type: CommandType
 
 
+class CommandFailedReq(BaseModel):
+    error_message: str = Field(default="", max_length=500)
+
+
 class StartSessionReq(BaseModel):
     startedAt: Optional[str] = None  # ISO8601
 

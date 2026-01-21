@@ -1,6 +1,7 @@
 import plotly.graph_objects as go
 from collections import defaultdict
 from database import get_db_connection
+from psycopg.sql import SQL, Literal
 
 
 def create_balls_over_time_chart(days=7):
@@ -12,7 +13,7 @@ def create_balls_over_time_chart(days=7):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             # Get sessions from last N days with ball counts per type, aggregated by day
-            cur.execute(f"""
+            query = SQL("""
                 SELECT 
                     DATE(cs.started_at) as session_date,
                     bt.name as ball_type,
@@ -20,10 +21,11 @@ def create_balls_over_time_chart(days=7):
                 FROM cleaning_session cs
                 JOIN session_item si ON cs.id = si.session_id
                 JOIN ball_type bt ON si.ball_type_id = bt.id
-                WHERE cs.started_at >= NOW() - INTERVAL '{days + 1} days'
+                WHERE cs.started_at >= NOW() - INTERVAL {} || ' days'
                 GROUP BY DATE(cs.started_at), bt.name, bt.id
                 ORDER BY session_date, bt.id
-            """)
+            """).format(Literal(str(days + 1)))
+            cur.execute(query)
             results = cur.fetchall()
     
     # Organize data by ball type
@@ -43,7 +45,7 @@ def create_balls_over_time_chart(days=7):
     # Create stacked area chart
     fig = go.Figure()
     
-    colors = {'Basketbal': '#FF6B6B', 'Voetbal': '#4ECDC4', 'Volleybal': '#FFE66D'}
+    colors = {'Basketbal': '#e79426', 'Voetbal': '#4619ee', 'Volleybal': '#dbce18'}
     
     for ball_type, data in data_by_type.items():
         fig.add_trace(go.Scatter(
