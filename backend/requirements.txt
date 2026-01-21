@@ -1,7 +1,6 @@
-fastapi
-uvicorn[standard]
-psycopg[binary]
-plotly
-pandas
-kaleido
-python-dotenv
+fastapi==0.118.0
+uvicorn[standard]==0.37.0
+psycopg[binary]==3.3.2
+plotly==5.11.0
+kaleido==1.2.0
+python-dotenv==1.1.0

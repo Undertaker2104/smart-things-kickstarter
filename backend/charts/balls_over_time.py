@@ -21,10 +21,10 @@ def create_balls_over_time_chart(days=7):
                 FROM cleaning_session cs
                 JOIN session_item si ON cs.id = si.session_id
                 JOIN ball_type bt ON si.ball_type_id = bt.id
-                WHERE cs.started_at >= NOW() - INTERVAL {} || ' days'
+                WHERE cs.started_at >= NOW() - INTERVAL {}
                 GROUP BY DATE(cs.started_at), bt.name, bt.id
                 ORDER BY session_date, bt.id
-            """).format(Literal(str(days + 1)))
+            """).format(Literal(f"{days + 1} days"))
             cur.execute(query)
             results = cur.fetchall()
     

@@ -19,10 +19,10 @@ def create_low_pressure_chart(days=7):
                 FROM ball_type bt
                 LEFT JOIN event_log el ON el.details LIKE bt.name || '%' 
                     AND el.code = 'LOW_PRESSURE'
-                    AND el.timestamp >= NOW() - INTERVAL {} || ' days'
+                    AND el.timestamp >= NOW() - INTERVAL {}
                 GROUP BY bt.id, bt.name
                 ORDER BY bt.id
-            """).format(Literal(str(days)))
+            """).format(Literal(f"{days} days"))
             cur.execute(query)
             results = cur.fetchall()
     
