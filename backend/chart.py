@@ -26,7 +26,13 @@ if __name__ == "__main__":
     fig_json3 = create_low_pressure_chart(days=7)
     print("✓ Chart generated successfully!")
     
-    # Show all charts
+    print("\n✓ All charts generated successfully!")
+    print("Charts are available via API endpoints:")
+    print("  - http://localhost:8000/api/charts/expected-vs-counted")
+    print("  - http://localhost:8000/api/charts/balls-over-time")
+    print("  - http://localhost:8000/api/charts/low-pressure")
+    
+    # Uncomment below to open in browser (requires setuptools for Python 3.12+)
     print("\nOpening charts in browser...")
     fig1 = pio.from_json(fig_json)
     fig1.show()
