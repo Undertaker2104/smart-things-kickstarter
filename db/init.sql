@@ -13,7 +13,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
-  CREATE TYPE event_code AS ENUM ('EMERGENCY_STOP','FOREIGN_OBJECT','JAM','SENSOR_FAIL','LOW_PRESSURE');
+  CREATE TYPE event_code AS ENUM ('EMERGENCY_STOP','FOREIGN_OBJECT','JAM','SENSOR_FAIL');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
@@ -31,9 +31,7 @@ CREATE TABLE IF NOT EXISTS ball_type (
   id           INT PRIMARY KEY,
   name         TEXT NOT NULL,
   diameter     REAL NOT NULL,
-  allowed      BOOLEAN NOT NULL DEFAULT TRUE,
-  ref_motor_load REAL,
-  load_tolerance REAL
+  allowed      BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS cleaning_session (
@@ -82,14 +80,12 @@ CREATE INDEX IF NOT EXISTS idx_event_log_session_time ON event_log(session_id, t
 CREATE INDEX IF NOT EXISTS idx_session_status_time ON cleaning_session(status, started_at DESC);
 CREATE INDEX IF NOT EXISTS idx_command_status ON command(command_status, created_at);
 
--- 4) Seed data (ball types with motor load values)
-INSERT INTO ball_type (id, name, diameter, allowed, ref_motor_load, load_tolerance) VALUES
-  (1, 'Basketbal', 24.0, TRUE, 3.5, 0.5),
-  (2, 'Voetbal',   22.0, TRUE, 3.0, 0.4),
-  (3, 'Volleybal', 21.0, TRUE, 2.8, 0.3)
-ON CONFLICT (id) DO UPDATE SET 
-  ref_motor_load = EXCLUDED.ref_motor_load,
-  load_tolerance = EXCLUDED.load_tolerance;
+-- 4) Seed data (ball types)
+INSERT INTO ball_type (id, name, diameter, allowed) VALUES
+  (1, 'Basketbal', 24.0, TRUE),
+  (2, 'Voetbal',   22.0, TRUE),
+  (3, 'Volleybal', 21.0, TRUE)
+ON CONFLICT (id) DO NOTHING;
 
 -- Expected inventory counts
 INSERT INTO inventory_expected (ball_type_id, expected_count) VALUES
@@ -163,34 +159,12 @@ INSERT INTO session_item (session_id, ball_type_id, count) VALUES
   (24, 1, 50), (24, 2, 60), (24, 3, 39)
 ON CONFLICT (session_id, ball_type_id) DO NOTHING;
 
--- 7) Seed event logs (LOW_PRESSURE events for soft balls)
+-- 7) Seed event logs
 INSERT INTO event_log (timestamp, level, code, session_id, details) VALUES
-  -- Session 1 events
-  (NOW() - INTERVAL '7 days' + INTERVAL '8 hours 10 minutes', 'WARN', 'LOW_PRESSURE', 1, 'Basketbal #12 detected low pressure'),
-  (NOW() - INTERVAL '7 days' + INTERVAL '8 hours 25 minutes', 'WARN', 'LOW_PRESSURE', 1, 'Voetbal #34 detected low pressure'),
-  -- Session 3 events
-  (NOW() - INTERVAL '7 days' + INTERVAL '16 hours 15 minutes', 'WARN', 'LOW_PRESSURE', 3, 'Volleybal #8 detected low pressure'),
-  (NOW() - INTERVAL '7 days' + INTERVAL '16 hours 30 minutes', 'WARN', 'LOW_PRESSURE', 3, 'Basketbal #5 detected low pressure'),
   -- Session 5 events (ERROR session)
   (NOW() - INTERVAL '6 days' + INTERVAL '13 hours 20 minutes', 'ERROR', 'JAM', 5, 'Ball jam detected in conveyor'),
-  (NOW() - INTERVAL '6 days' + INTERVAL '13 hours 22 minutes', 'WARN', 'LOW_PRESSURE', 5, 'Voetbal #45 detected low pressure'),
-  (NOW() - INTERVAL '6 days' + INTERVAL '13 hours 28 minutes', 'WARN', 'LOW_PRESSURE', 5, 'Basketbal #18 detected low pressure'),
-  -- Session 7 events
-  (NOW() - INTERVAL '5 days' + INTERVAL '8 hours 18 minutes', 'WARN', 'LOW_PRESSURE', 7, 'Voetbal #29 detected low pressure'),
-  -- Session 9 events
-  (NOW() - INTERVAL '5 days' + INTERVAL '14 hours 12 minutes', 'WARN', 'LOW_PRESSURE', 9, 'Basketbal #7 detected low pressure'),
-  (NOW() - INTERVAL '5 days' + INTERVAL '14 hours 40 minutes', 'WARN', 'LOW_PRESSURE', 9, 'Voetbal #51 detected low pressure'),
-  -- Session 11 events
-  (NOW() - INTERVAL '4 days' + INTERVAL '9 hours 25 minutes', 'WARN', 'LOW_PRESSURE', 11, 'Volleybal #15 detected low pressure'),
-  -- Session 17 events
-  (NOW() - INTERVAL '2 days' + INTERVAL '11 hours 20 minutes', 'WARN', 'LOW_PRESSURE', 17, 'Basketbal #33 detected low pressure'),
-  (NOW() - INTERVAL '2 days' + INTERVAL '11 hours 32 minutes', 'WARN', 'LOW_PRESSURE', 17, 'Voetbal #19 detected low pressure'),
-  -- Session 23 events (recent)
-  (NOW() - INTERVAL '6 hours' + INTERVAL '15 minutes', 'WARN', 'LOW_PRESSURE', 23, 'Basketbal #44 detected low pressure'),
-  (NOW() - INTERVAL '6 hours' + INTERVAL '28 minutes', 'INFO', 'SENSOR_FAIL', 23, 'Pressure sensor temporary failure'),
-  -- Session 24 events (most recent)
-  (NOW() - INTERVAL '2 hours' + INTERVAL '18 minutes', 'WARN', 'LOW_PRESSURE', 24, 'Voetbal #27 detected low pressure'),
-  (NOW() - INTERVAL '2 hours' + INTERVAL '25 minutes', 'WARN', 'LOW_PRESSURE', 24, 'Volleybal #9 detected low pressure')
+  -- Session 23 events
+  (NOW() - INTERVAL '6 hours' + INTERVAL '28 minutes', 'INFO', 'SENSOR_FAIL', 23, 'Pressure sensor temporary failure')
 ON CONFLICT DO NOTHING;
 
 -- Reset sequence for auto-increment IDs
