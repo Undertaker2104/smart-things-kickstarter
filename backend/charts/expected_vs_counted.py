@@ -10,7 +10,7 @@ def create_expected_vs_counted_chart():
     """
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            # Get expected counts and latest session counts
+            # Get expected counts and latest completed session counts
             cur.execute("""
                 SELECT 
                     bt.id,
@@ -22,7 +22,12 @@ def create_expected_vs_counted_chart():
                 LEFT JOIN (
                     SELECT si.ball_type_id, si.count
                     FROM session_item si
-                    WHERE si.session_id = (SELECT MAX(id) FROM cleaning_session)
+                    WHERE si.session_id = (
+                        SELECT id FROM cleaning_session 
+                        WHERE status IN ('OK', 'STOPPED', 'ERROR')
+                        ORDER BY ended_at DESC NULLS LAST
+                        LIMIT 1
+                    )
                 ) si ON bt.id = si.ball_type_id
                 ORDER BY bt.id
             """)
