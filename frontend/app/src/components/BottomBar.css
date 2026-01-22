@@ -1,42 +1,93 @@
+/* Size variables for easy tweaking */
+:root {
+  --bottom-bar-width: 45%;
+  --botTop-width: 70%;
+  --botTop-height: 40px;
+  --botBot-width: 100%;
+  --botBot-height: 100px;
+  --ctrl-button-width: 180px;
+  --ctrl-button-height: 40px;
+  --ctrl-button-gap: 20px;
+  --ctrl-button-font-size: 18px;
+}
+
 .bottom-bar {
   position: fixed;
   bottom: 0;
-  left: 50%;           /* start from center */
-  transform: translateX(-50%); /* shift back by half width to center */
-  width: 45%;          /* now bar is 45% of screen width */
-  height: 110px;
+  left: 50%;
+  /* start from center */
+  transform: translateX(-50%);
+  /* shift back by half width to center */
+  width: var(--bottom-bar-width);
+  /* now bar is 45% of screen width */
+  height: auto;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 15px 0 0 0;
+  z-index: 1000;
+}
+
+.botTop {
+  width: var(--botTop-width);
+  min-width: 0;
+  height: var(--botTop-height);
+  background-color: var(--block);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding: 15px 0px;
+  flex-shrink: 0;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.botBot {
+  width: var(--botBot-width);
+  min-width: 0;
+  height: var(--botBot-height);
   background-color: var(--header);
   display: flex;
   justify-content: center;
   align-items: center;
   color: white;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
-  z-index: 1000;
   padding: 0 10px;
-  border-radius: 10px 10px 0px 0px; /* optional, makes the bar look nicer */
+  flex-shrink: 0;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 }
 
 /* Container to hold all buttons and space them */
 .btm-buttons-container {
   display: flex;
-  gap: 100px; /* <-- easy-to-tweak spacing between buttons */
+  gap: 80px;
+  /* <-- easy-to-tweak spacing between buttons */
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 /* Individual buttons */
 .btmBut {
   display: flex;
-  flex-direction: column; /* icon on top, label below */
+  flex-direction: column;
+  /* icon on top, label below */
   align-items: center;
   justify-content: center;
   gap: 4px;
-  width: 80px;   /* fixed width */
-  height: 80px;  /* fixed height */
+  width: 80px;
+  /* fixed width */
+  height: 80px;
+  /* fixed height */
   background: none;
   border: none;
   color: white;
   cursor: pointer;
   border-radius: 15px;
-  flex-shrink: 0; /* ensures buttons don’t shrink */
+  flex-shrink: 0;
+  /* ensures buttons don’t shrink */
 }
 
 .btmBut:hover {
@@ -52,4 +103,46 @@
 .btmBut .label {
   font-size: 15px;
   text-align: center;
+}
+
+/* Control buttons container */
+.ctrl-buttons-container {
+  display: flex;
+  gap: var(--ctrl-button-gap);
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+/* Pause and Stop buttons */
+.pauseBut,
+.stopBut {
+  width: var(--ctrl-button-width);
+  height: var(--ctrl-button-height);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: var(--ctrl-button-font-size);
+  transition: opacity 0.2s;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.pauseBut {
+  background: var(--pause);
+  color: white;
+}
+
+.stopBut {
+  background: var(--stop);
+  color: white;
+}
+
+.pauseBut:hover,
+.stopBut:hover {
+  opacity: 0.9;
+}
+
+.butText {
+  font-size: var(--ctrl-button-font-size);
+  font-weight: 500;
 }
