@@ -122,7 +122,6 @@
   border-radius: 10px;
   cursor: pointer;
   font-size: var(--ctrl-button-font-size);
-  font-weight: 800;
   transition: opacity 0.2s;
   flex-shrink: 1;
   min-width: 0;
