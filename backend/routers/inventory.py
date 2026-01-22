@@ -1,14 +1,9 @@
 """Inventory endpoints for managing expected ball counts."""
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
 from database import get_db_connection
+from models import InventoryUpdateReq
 
 router = APIRouter(prefix="/api/inventory", tags=["inventory"])
-
-
-class InventoryUpdateReq(BaseModel):
-    ball_type_id: int
-    expected_count: int = Field(ge=0)
 
 
 @router.get("")
@@ -39,12 +34,6 @@ def update_inventory(ball_type_id: int, body: InventoryUpdateReq):
     Update expected count for a specific ball type.
     Creates or updates the inventory_expected record.
     """
-    if ball_type_id != body.ball_type_id:
-        raise HTTPException(
-            status_code=400,
-            detail="Ball type ID in URL must match body"
-        )
-    
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             # Check if ball_type exists
@@ -61,7 +50,7 @@ def update_inventory(ball_type_id: int, body: InventoryUpdateReq):
                     expected_count = EXCLUDED.expected_count,
                     updated_at = NOW()
                 RETURNING ball_type_id, expected_count, updated_at
-            """, (body.ball_type_id, body.expected_count))
+            """, (ball_type_id, body.expected_count))
             result = cur.fetchone()
         conn.commit()
     
