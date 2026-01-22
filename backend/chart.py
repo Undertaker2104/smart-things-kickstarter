@@ -29,6 +29,5 @@ if __name__ == "__main__":
     print("\nOpening charts in browser...")
     fig1 = pio.from_json(fig_json)
     fig1.show()
-    # 
     fig2 = pio.from_json(fig_json2)
     fig2.show()
