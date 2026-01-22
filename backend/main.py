@@ -1,5 +1,6 @@
 """Ball Cleaner API - Main application entry point."""
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from routers import commands, sessions, state, charts, inventory
 
@@ -11,6 +12,14 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
 )
 
+# CORS middleware configuratie
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:5174"],  # Vite dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(commands.router)
 app.include_router(sessions.router)
