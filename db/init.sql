@@ -5,7 +5,7 @@ BEGIN;
 
 -- 1) Enums (als TEXT + CHECK kan ook, maar enums zijn prima in Postgres)
 DO $$ BEGIN
-  CREATE TYPE session_status AS ENUM ('RUNNING','PASSED','FINISHED','ERROR');
+  CREATE TYPE session_status AS ENUM ('RUNNING','PAUSED','FINISHED','ERROR');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
@@ -97,37 +97,37 @@ ON CONFLICT (ball_type_id) DO NOTHING;
 -- 5) Seed cleaning sessions (last 7 days with multiple sessions per day)
 INSERT INTO cleaning_session (id, started_at, ended_at, status) VALUES
   -- 7 days ago (3 sessions)
-  (1, NOW() - INTERVAL '7 days' + INTERVAL '8 hours', NOW() - INTERVAL '7 days' + INTERVAL '8 hours 45 minutes', 'OK'),
-  (2, NOW() - INTERVAL '7 days' + INTERVAL '12 hours', NOW() - INTERVAL '7 days' + INTERVAL '12 hours 38 minutes', 'OK'),
-  (3, NOW() - INTERVAL '7 days' + INTERVAL '16 hours', NOW() - INTERVAL '7 days' + INTERVAL '16 hours 42 minutes', 'OK'),
+  (1, NOW() - INTERVAL '7 days' + INTERVAL '8 hours', NOW() - INTERVAL '7 days' + INTERVAL '8 hours 45 minutes', 'PAUSED'),
+  (2, NOW() - INTERVAL '7 days' + INTERVAL '12 hours', NOW() - INTERVAL '7 days' + INTERVAL '12 hours 38 minutes', 'PAUSED'),
+  (3, NOW() - INTERVAL '7 days' + INTERVAL '16 hours', NOW() - INTERVAL '7 days' + INTERVAL '16 hours 42 minutes', 'PAUSED'),
   -- 6 days ago (3 sessions)
-  (4, NOW() - INTERVAL '6 days' + INTERVAL '9 hours', NOW() - INTERVAL '6 days' + INTERVAL '9 hours 50 minutes', 'OK'),
+  (4, NOW() - INTERVAL '6 days' + INTERVAL '9 hours', NOW() - INTERVAL '6 days' + INTERVAL '9 hours 50 minutes', 'PAUSED'),
   (5, NOW() - INTERVAL '6 days' + INTERVAL '13 hours', NOW() - INTERVAL '6 days' + INTERVAL '13 hours 35 minutes', 'ERROR'),
-  (6, NOW() - INTERVAL '6 days' + INTERVAL '17 hours', NOW() - INTERVAL '6 days' + INTERVAL '17 hours 40 minutes', 'OK'),
+  (6, NOW() - INTERVAL '6 days' + INTERVAL '17 hours', NOW() - INTERVAL '6 days' + INTERVAL '17 hours 40 minutes', 'PAUSED'),
   -- 5 days ago (4 sessions)
-  (7, NOW() - INTERVAL '5 days' + INTERVAL '8 hours', NOW() - INTERVAL '5 days' + INTERVAL '8 hours 48 minutes', 'OK'),
-  (8, NOW() - INTERVAL '5 days' + INTERVAL '11 hours', NOW() - INTERVAL '5 days' + INTERVAL '11 hours 43 minutes', 'OK'),
-  (9, NOW() - INTERVAL '5 days' + INTERVAL '14 hours', NOW() - INTERVAL '5 days' + INTERVAL '14 hours 52 minutes', 'OK'),
-  (10, NOW() - INTERVAL '5 days' + INTERVAL '18 hours', NOW() - INTERVAL '5 days' + INTERVAL '18 hours 38 minutes', 'OK'),
+  (7, NOW() - INTERVAL '5 days' + INTERVAL '8 hours', NOW() - INTERVAL '5 days' + INTERVAL '8 hours 48 minutes', 'PAUSED'),
+  (8, NOW() - INTERVAL '5 days' + INTERVAL '11 hours', NOW() - INTERVAL '5 days' + INTERVAL '11 hours 43 minutes', 'PAUSED'),
+  (9, NOW() - INTERVAL '5 days' + INTERVAL '14 hours', NOW() - INTERVAL '5 days' + INTERVAL '14 hours 52 minutes', 'PAUSED'),
+  (10, NOW() - INTERVAL '5 days' + INTERVAL '18 hours', NOW() - INTERVAL '5 days' + INTERVAL '18 hours 38 minutes', 'PAUSED'),
   -- 4 days ago (3 sessions)
-  (11, NOW() - INTERVAL '4 days' + INTERVAL '9 hours', NOW() - INTERVAL '4 days' + INTERVAL '9 hours 44 minutes', 'OK'),
-  (12, NOW() - INTERVAL '4 days' + INTERVAL '13 hours', NOW() - INTERVAL '4 days' + INTERVAL '13 hours 41 minutes', 'OK'),
-  (13, NOW() - INTERVAL '4 days' + INTERVAL '16 hours', NOW() - INTERVAL '4 days' + INTERVAL '16 hours 47 minutes', 'OK'),
+  (11, NOW() - INTERVAL '4 days' + INTERVAL '9 hours', NOW() - INTERVAL '4 days' + INTERVAL '9 hours 44 minutes', 'PAUSED'),
+  (12, NOW() - INTERVAL '4 days' + INTERVAL '13 hours', NOW() - INTERVAL '4 days' + INTERVAL '13 hours 41 minutes', 'PAUSED'),
+  (13, NOW() - INTERVAL '4 days' + INTERVAL '16 hours', NOW() - INTERVAL '4 days' + INTERVAL '16 hours 47 minutes', 'PAUSED'),
   -- 3 days ago (2 sessions)
-  (14, NOW() - INTERVAL '3 days' + INTERVAL '10 hours', NOW() - INTERVAL '3 days' + INTERVAL '10 hours 39 minutes', 'OK'),
-  (15, NOW() - INTERVAL '3 days' + INTERVAL '15 hours', NOW() - INTERVAL '3 days' + INTERVAL '15 hours 46 minutes', 'OK'),
+  (14, NOW() - INTERVAL '3 days' + INTERVAL '10 hours', NOW() - INTERVAL '3 days' + INTERVAL '10 hours 39 minutes', 'PAUSED'),
+  (15, NOW() - INTERVAL '3 days' + INTERVAL '15 hours', NOW() - INTERVAL '3 days' + INTERVAL '15 hours 46 minutes', 'PAUSED'),
   -- 2 days ago (4 sessions)
-  (16, NOW() - INTERVAL '2 days' + INTERVAL '8 hours', NOW() - INTERVAL '2 days' + INTERVAL '8 hours 41 minutes', 'OK'),
-  (17, NOW() - INTERVAL '2 days' + INTERVAL '11 hours', NOW() - INTERVAL '2 days' + INTERVAL '11 hours 48 minutes', 'OK'),
-  (18, NOW() - INTERVAL '2 days' + INTERVAL '14 hours', NOW() - INTERVAL '2 days' + INTERVAL '14 hours 36 minutes', 'OK'),
-  (19, NOW() - INTERVAL '2 days' + INTERVAL '17 hours', NOW() - INTERVAL '2 days' + INTERVAL '17 hours 44 minutes', 'OK'),
+  (16, NOW() - INTERVAL '2 days' + INTERVAL '8 hours', NOW() - INTERVAL '2 days' + INTERVAL '8 hours 41 minutes', 'PAUSED'),
+  (17, NOW() - INTERVAL '2 days' + INTERVAL '11 hours', NOW() - INTERVAL '2 days' + INTERVAL '11 hours 48 minutes', 'PAUSED'),
+  (18, NOW() - INTERVAL '2 days' + INTERVAL '14 hours', NOW() - INTERVAL '2 days' + INTERVAL '14 hours 36 minutes', 'PAUSED'),
+  (19, NOW() - INTERVAL '2 days' + INTERVAL '17 hours', NOW() - INTERVAL '2 days' + INTERVAL '17 hours 44 minutes', 'PAUSED'),
   -- 1 day ago (3 sessions)
-  (20, NOW() - INTERVAL '1 day' + INTERVAL '9 hours', NOW() - INTERVAL '1 day' + INTERVAL '9 hours 42 minutes', 'OK'),
-  (21, NOW() - INTERVAL '1 day' + INTERVAL '13 hours', NOW() - INTERVAL '1 day' + INTERVAL '13 hours 50 minutes', 'OK'),
-  (22, NOW() - INTERVAL '1 day' + INTERVAL '16 hours', NOW() - INTERVAL '1 day' + INTERVAL '16 hours 38 minutes', 'OK'),
+  (20, NOW() - INTERVAL '1 day' + INTERVAL '9 hours', NOW() - INTERVAL '1 day' + INTERVAL '9 hours 42 minutes', 'PAUSED'),
+  (21, NOW() - INTERVAL '1 day' + INTERVAL '13 hours', NOW() - INTERVAL '1 day' + INTERVAL '13 hours 50 minutes', 'PAUSED'),
+  (22, NOW() - INTERVAL '1 day' + INTERVAL '16 hours', NOW() - INTERVAL '1 day' + INTERVAL '16 hours 38 minutes', 'PAUSED'),
   -- Today (2 sessions)
-  (23, NOW() - INTERVAL '6 hours', NOW() - INTERVAL '6 hours' + INTERVAL '45 minutes', 'OK'),
-  (24, NOW() - INTERVAL '2 hours', NOW() - INTERVAL '2 hours' + INTERVAL '40 minutes', 'OK')
+  (23, NOW() - INTERVAL '6 hours', NOW() - INTERVAL '6 hours' + INTERVAL '45 minutes', 'PAUSED'),
+  (24, NOW() - INTERVAL '2 hours', NOW() - INTERVAL '2 hours' + INTERVAL '40 minutes', 'PAUSED')
 ON CONFLICT (id) DO NOTHING;
 
 -- 6) Seed session items (counted balls per type per session)
