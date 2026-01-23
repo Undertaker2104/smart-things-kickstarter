@@ -12,7 +12,7 @@ function App() {
       <div className="app-width-container">
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<DataPage />} />
+            <Route path="/" element={<StatusPage />} />
             <Route path="/data" element={<DataPage />} />
             <Route path="/status" element={<StatusPage />} />
             <Route path="/inventory" element={<InventoryPage />} />
