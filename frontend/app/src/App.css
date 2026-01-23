@@ -10,11 +10,30 @@
   height: 100%;
 }
 
+.app-width-container {
+  flex: 1;
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--content);
+}
+
 .main-content {
   flex: 1;
-  overflow-y: auto;
-  padding-bottom: 70px;
-  /* ruimte voor bottom bar */
+  overflow: hidden;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  margin-bottom: 120px;
+  /* IE and Edge */
+}
+
+.main-content::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 .logo {

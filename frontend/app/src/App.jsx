@@ -9,14 +9,16 @@ import BottomBar from './components/BottomBar'
 function App() {
   return (
     <div className="app-container">
-      <main className="main-content">
-        <Routes>
-          <Route path="/" element={<DataPage />} />
-          <Route path="/data" element={<DataPage />} />
-          <Route path="/status" element={<StatusPage />} />
-          <Route path="/inventory" element={<InventoryPage />} />
-        </Routes>
-      </main>
+      <div className="app-width-container">
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<DataPage />} />
+            <Route path="/data" element={<DataPage />} />
+            <Route path="/status" element={<StatusPage />} />
+            <Route path="/inventory" element={<InventoryPage />} />
+          </Routes>
+        </main>
+      </div>
       <BottomBar />
     </div>
   )
