@@ -8,7 +8,7 @@
   --ctrl-button-width: 180px;
   --ctrl-button-height: 40px;
   --ctrl-button-gap: 20px;
-  --ctrl-button-font-size: 18px;
+  --ctrl-button-font-size: 14px;
 }
 
 .bottom-bar {
@@ -94,6 +94,10 @@
   background-color: var(--hover);
 }
 
+.btmBut.active {
+  background-color: var(--hover);
+}
+
 .btmBut .icon {
   width: 30px;
   height: 30px;
@@ -119,7 +123,7 @@
   width: var(--ctrl-button-width);
   height: var(--ctrl-button-height);
   border: none;
-  border-radius: 10px;
+  border-radius: 7px;
   cursor: pointer;
   font-size: var(--ctrl-button-font-size);
   transition: opacity 0.2s;
@@ -144,5 +148,5 @@
 
 .butText {
   font-size: var(--ctrl-button-font-size);
-  font-weight: 500;
+  font-weight: 800;
 }
