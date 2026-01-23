@@ -3,11 +3,28 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { chartAPI } from '../services/api'
 import './DataPage.css'
 
+function DataCards({ sessionsThisWeek, cleanedToday }) {
+    return (
+        <div className="data-cards-container">
+            <div className="data-card">
+                <span className="data-card-label">Sessions this week:</span>
+                <span className="data-card-value">{sessionsThisWeek}</span>
+            </div>
+            <div className="data-card">
+                <span className="data-card-label">Cleaned today:</span>
+                <span className="data-card-value">{cleanedToday}</span>
+            </div>
+        </div>
+    )
+}
+
 const DataPage = () => {
     const [expectedVsCountedData, setExpectedVsCountedData] = useState([])
     const [ballsOverTimeData, setBallsOverTimeData] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [sessionsThisWeek, setSessionsThisWeek] = useState(0)
+    const [cleanedToday, setCleanedToday] = useState(0)
 
     useEffect(() => {
         loadCharts()
@@ -29,6 +46,41 @@ const DataPage = () => {
 
             setExpectedVsCountedData(barData)
             setBallsOverTimeData(lineData)
+
+            // Calculate sessionsThisWeek and cleanedToday from ballsOverTime
+            // Sessions = number of nonzero days in any trace
+            // Cleaned today = sum of all balls cleaned today (last date)
+            if (ballsOverTime && ballsOverTime.data && ballsOverTime.data.length > 0) {
+                // Get all unique dates
+                const allDates = new Set()
+                ballsOverTime.data.forEach(trace => {
+                    trace.x?.forEach(date => allDates.add(date))
+                })
+                const dates = Array.from(allDates).sort()
+                // Sessions this week: count days with any activity
+                let sessionCount = 0
+                dates.forEach(date => {
+                    let any = false
+                    ballsOverTime.data.forEach(trace => {
+                        const idx = trace.x?.indexOf(date)
+                        if (idx !== -1 && idx !== undefined && trace.y?.[idx] > 0) {
+                            any = true
+                        }
+                    })
+                    if (any) sessionCount++
+                })
+                setSessionsThisWeek(sessionCount)
+                // Cleaned today: sum of all balls on today's date
+                const today = new Date().toISOString().slice(0, 10)
+                let cleaned = 0
+                ballsOverTime.data.forEach(trace => {
+                    const idx = trace.x?.findIndex(date => date && date.slice(0, 10) === today)
+                    if (idx !== -1 && idx !== undefined) {
+                        cleaned += trace.y?.[idx] || 0
+                    }
+                })
+                setCleanedToday(cleaned)
+            }
         } catch (err) {
             setError(err.message)
         } finally {
@@ -118,9 +170,9 @@ const DataPage = () => {
 
     return (
         <div className="data-page">
-            <h1>Data & Charts</h1>
-
+            <h1>Sportini Cleani</h1>
             <div className="data-content">
+                <DataCards sessionsThisWeek={sessionsThisWeek} cleanedToday={cleanedToday} />
                 {/* Expected vs Counted Chart */}
                 <div className="chart-container">
                     <h2>Verwacht vs Geteld</h2>
@@ -156,9 +208,12 @@ const DataPage = () => {
                             <Legend />
                             <Line type="monotone" dataKey="Basketbal" stroke="#e79426" strokeWidth={2} activeDot={false} />
                             <Line type="monotone" dataKey="Voetbal" stroke="#4619ee" strokeWidth={2} activeDot={false} />
-                            <Line type="monotone" dataKey="Volleybal" stroke="#dbce18" strokeWidth={2} activeDot={false} />
+                            <Line type="monotone" dataKey="Volleybal" stroke="#f1e320" strokeWidth={2} activeDot={false} />
                         </LineChart>
                     </ResponsiveContainer>
+                </div>
+                <div className="empty">
+
                 </div>
             </div>
         </div>
