@@ -5,7 +5,7 @@ BEGIN;
 
 -- 1) Enums (als TEXT + CHECK kan ook, maar enums zijn prima in Postgres)
 DO $$ BEGIN
-  CREATE TYPE session_status AS ENUM ('RUNNING','OK','STOPPED','EMERGENCY','ERROR');
+  CREATE TYPE session_status AS ENUM ('RUNNING','PASSED','FINISHED',,'ERROR');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
