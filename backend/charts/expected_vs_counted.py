@@ -24,7 +24,7 @@ def create_expected_vs_counted_chart():
                     FROM session_item si
                     WHERE si.session_id = (
                         SELECT id FROM cleaning_session 
-                        WHERE status IN ('OK', 'STOPPED', 'ERROR')
+                        WHERE status IN ('PAUSED', 'FINISHED', 'ERROR')
                         ORDER BY ended_at DESC NULLS LAST
                         LIMIT 1
                     )
