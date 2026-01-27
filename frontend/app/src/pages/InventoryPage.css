@@ -71,6 +71,7 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .status-bar {
     margin-top: 1rem;
     height: 4px;
@@ -141,7 +142,7 @@
     flex-shrink: 0;
 }
 
-.inventory-ball > p {
+.inventory-ball>p {
     flex: 1;
     min-width: 0;
     margin-right: 0;
@@ -228,13 +229,14 @@
 .inventory-divider-line {
     width: 100%;
     height: 1px;
-    background-color: #666;
-    border-radius: 15px;;
+    background-color: var(--divider);
+    border-radius: 15px;
+    ;
 }
 
 .inventory-divider-line {
     margin-top: auto;
     height: 2px;
-    background-color: #ccc;
+    background-color: var(--divider-light);
     margin-bottom: 10px;
 }

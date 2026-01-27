@@ -98,6 +98,11 @@
   background-color: var(--hover);
 }
 
+.btmBut:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btmBut .icon {
   width: 30px;
   height: 30px;
@@ -119,7 +124,8 @@
 
 /* Pause and Stop buttons */
 .pauseBut,
-.stopBut {
+.stopBut,
+.startBut {
   width: var(--ctrl-button-width);
   height: var(--ctrl-button-height);
   border: none;
@@ -136,9 +142,21 @@
   color: white;
 }
 
+.startBut {
+  background: var(--start);
+  color: white;
+}
+
 .stopBut {
   background: var(--stop);
   color: white;
+}
+
+.stopBut:disabled {
+  background: #888888;
+  color: #e0e0e0;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .pauseBut:hover,

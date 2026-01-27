@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://145.24.237.126:8000";
+export const API_BASE_URL = "http://localhost:8000";
 fetch(`{API_BASE_URL}/api/charts/expected-vs-counted`)
 
 // Chart API endpoints

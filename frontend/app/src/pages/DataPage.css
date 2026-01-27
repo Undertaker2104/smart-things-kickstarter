@@ -32,23 +32,11 @@
 }
 
 .chart-container {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
     border-radius: 8px;
     padding: 1.5rem;
     outline: none;
     margin-bottom: 1px;
-}
-
-.chart-container :focus {
-    outline: none !important;
-}
-
-.chart-container svg:focus {
-    outline: none !important;
-}
-
-.empty {
-    height: 40px;
 }
 
 .data-cards-container {
@@ -60,7 +48,7 @@
 }
 
 .data-card {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--card-bg-hover);
     border-radius: 12px;
     padding: 10px 32px 12px 32px;
     display: flex;
@@ -69,7 +57,7 @@
     justify-content: space-between;
     min-width: 220px;
     font-size: 1.15rem;
-    color: #fff;
+    color: var(--text);
     box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
     border: 2.5px solid transparent;
     transition: border 0.2s;
@@ -81,14 +69,14 @@
 
 .data-card-label {
     font-size: 1.05rem;
-    color: #e0e0e0;
+    color: var(--text-secondary);
     margin-bottom: 0;
 }
 
 .data-card-value {
     font-size: 1.05rem;
     font-weight: 600;
-    color: #fff;
+    color: var(--text);
     letter-spacing: 1px;
     text-align: right;
     margin-left: 24px;
