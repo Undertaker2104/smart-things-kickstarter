@@ -15,16 +15,16 @@ def create_balls_over_time_chart(days=7):
             # Get sessions from last N days with ball counts per type, aggregated by day
             query = SQL("""
                 SELECT 
-                    DATE(cs.started_at) as session_date,
+                    DATE(cs.ended_at) as session_date,
                     bt.name as ball_type,
                     SUM(si.count) as total_count
                 FROM cleaning_session cs
                 JOIN session_item si ON cs.id = si.session_id
                 JOIN ball_type bt ON si.ball_type_id = bt.id
-                WHERE cs.started_at >= NOW() - INTERVAL {}
-                GROUP BY DATE(cs.started_at), bt.name, bt.id
+                WHERE cs.ended_at >= NOW() - INTERVAL '{} days'
+                GROUP BY DATE(cs.ended_at), bt.name, bt.id
                 ORDER BY session_date, bt.id
-            """).format(Literal(f"{days + 1} days"))
+            """).format(Literal(days))
             cur.execute(query)
             results = cur.fetchall()
     
@@ -58,9 +58,9 @@ def create_balls_over_time_chart(days=7):
         ))
     
     fig.update_layout(
-        title=f'Getelde Ballen Over Tijd (Laatste {days} Dagen)',
-        xaxis_title='Datum',
-        yaxis_title='Aantal Ballen',
+        title=f'Counted Balls Over Time (Last {days} Days)',
+        xaxis_title='Date',
+        yaxis_title='Number of Balls',
         hovermode='x unified',
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )

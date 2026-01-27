@@ -52,8 +52,8 @@ def create_expected_vs_counted_chart():
     
     # Create grouped bar chart
     fig = go.Figure(data=[
-        go.Bar(name='Verwacht', x=ball_types, y=expected, marker_color='lightblue'),
-        go.Bar(name='Geteld', x=ball_types, y=counted, marker_color='darkblue')
+        go.Bar(name='Expected', x=ball_types, y=expected, marker_color='lightblue'),
+        go.Bar(name='Counted', x=ball_types, y=counted, marker_color='darkblue')
     ])
     
     # Add delta annotations
@@ -67,9 +67,9 @@ def create_expected_vs_counted_chart():
         )
     
     fig.update_layout(
-        title='Verwacht vs. Geteld per Baltype',
-        xaxis_title='Baltype',
-        yaxis_title='Aantal',
+        title='Expected vs. Counted per Ball Type (Last Session)',
+        xaxis_title='Ball Type',
+        yaxis_title='Count',
         barmode='group',
         hovermode='x unified'
     )
