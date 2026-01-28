@@ -1,12 +1,12 @@
 /* Size variables for easy tweaking */
 :root {
-  --bottom-bar-width: 45%;
-  --botTop-width: 70%;
-  --botTop-height: 40px;
+  --bottom-bar-width: 100%;
+  --botTop-width: 85%;
+  --botTop-height: 10%;
   --botBot-width: 100%;
-  --botBot-height: 100px;
-  --ctrl-button-width: 180px;
-  --ctrl-button-height: 40px;
+  --botBot-height: 20%;
+  --ctrl-button-width: 130px;
+  --ctrl-button-height: 35px;
   --ctrl-button-gap: 20px;
   --ctrl-button-font-size: 14px;
 }
@@ -19,7 +19,6 @@
   transform: translateX(-50%);
   /* shift back by half width to center */
   width: var(--bottom-bar-width);
-  /* now bar is 45% of screen width */
   height: auto;
   background-color: transparent;
   display: flex;
@@ -63,10 +62,10 @@
 /* Container to hold all buttons and space them */
 .btm-buttons-container {
   display: flex;
-  gap: 80px;
-  /* <-- easy-to-tweak spacing between buttons */
+  gap: 50px;
   min-width: 0;
   flex-shrink: 1;
+  padding: 10px;
 }
 
 /* Individual buttons */
@@ -76,10 +75,11 @@
   /* icon on top, label below */
   align-items: center;
   justify-content: center;
+  padding: 10px;
   gap: 4px;
-  width: 80px;
+  width: 4.5rem;
   /* fixed width */
-  height: 80px;
+  height: 4.5rem;
   /* fixed height */
   background: none;
   border: none;
@@ -88,6 +88,49 @@
   border-radius: 15px;
   flex-shrink: 0;
   /* ensures buttons don’t shrink */
+}
+
+@media (min-width: 700px) {
+  :root {
+    --bottom-bar-width: 45%;
+    --botTop-width: 70%;
+    --botTop-height: 40px;
+    --botBot-width: 100%;
+    --botBot-height: 100px;
+    --ctrl-button-width: 180px;
+    --ctrl-button-height: 40px;
+    --ctrl-button-gap: 20px;
+    --ctrl-button-font-size: 14px;
+  }
+
+  /* Container to hold all buttons and space them */
+  .btm-buttons-container {
+    display: flex;
+    gap: 80px;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  /* Individual buttons */
+  .btmBut {
+    display: flex;
+    flex-direction: column;
+    /* icon on top, label below */
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 80px;
+    /* fixed width */
+    height: 80px;
+    /* fixed height */
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 15px;
+    flex-shrink: 0;
+    /* ensures buttons don’t shrink */
+  }
 }
 
 .btmBut:hover {
