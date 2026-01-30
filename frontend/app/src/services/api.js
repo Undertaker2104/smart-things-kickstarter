@@ -29,6 +29,14 @@ export const sessionAPI = {
             throw new Error('Failed to fetch sessions')
         }
         return response.json()
+    },
+
+    getSessionDetail: async (sessionId) => {
+        const response = await fetch(`${API_BASE_URL}/api/sessions/${sessionId}`)
+        if (!response.ok) {
+            throw new Error('Failed to fetch session detail')
+        }
+        return response.json()
     }
 }
 
