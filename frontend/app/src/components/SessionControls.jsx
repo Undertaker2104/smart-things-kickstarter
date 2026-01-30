@@ -10,6 +10,7 @@ const SessionControls = ({
     disabled = false
 }) => {
     const isDisabled = loading || disabled;
+
     return (
         <div className="ctrl-buttons-container">
             {sessionStatus === 'RUNNING' && (
@@ -32,7 +33,7 @@ const SessionControls = ({
                     </button>
                 </>
             )}
-            {!sessionStatus && (
+            {(!sessionStatus || sessionStatus === 'ERROR') && (
                 <>
                     <button className='startBut' onClick={onStart} disabled={isDisabled}>
                         <span className="butText">Start Session</span>
