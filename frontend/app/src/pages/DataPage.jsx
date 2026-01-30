@@ -211,7 +211,7 @@ const DataPage = () => {
             <div className="data-content">
                 <DataCards sessionsThisWeek={sessionsThisWeek} cleanedToday={cleanedToday} />
                 <div className="chart-container">
-                    <h2>Expected vs Counted</h2>
+                    <h2>Expected vs Counted (last active session)</h2>
                     <ResponsiveContainer width="100%" height={400}>
                         <BarChart data={expectedVsCountedData} margin={{ top: 25, right: 30, left: 20, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#444" />
@@ -231,7 +231,7 @@ const DataPage = () => {
 
                 {/* Balls Over Time Chart */}
                 <div className="chart-container">
-                    <h2>Balls Over Time (7 days)</h2>
+                    <h2>Balls cleaned over time (7 days)</h2>
                     <ResponsiveContainer width="100%" height={400}>
                         <LineChart data={ballsOverTimeData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#444" />
