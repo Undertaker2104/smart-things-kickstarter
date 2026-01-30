@@ -33,6 +33,45 @@ def start_session(body: StartSessionReq):
     }
 
 
+@router.post("/resume")
+def resume_session():
+    """Resume the most-recent paused cleaning session.
+
+    Frontend calls this endpoint without a body (it resumes the latest PAUSED session).
+    Returns 404 if no paused session is found.
+    """
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            # Find the most recent paused session
+            cur.execute(
+                """
+                SELECT id FROM cleaning_session
+                WHERE status = 'PAUSED'
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+            )
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="No paused session to resume")
+            session_id = row["id"]
+
+            # Resume: set status back to RUNNING and clear ended_at
+            cur.execute(
+                """
+                UPDATE cleaning_session
+                SET status = 'RUNNING', ended_at = NULL
+                WHERE id = %s
+                RETURNING id, started_at, ended_at, status
+                """,
+                (session_id,),
+            )
+            updated = cur.fetchone()
+        conn.commit()
+
+    return {"sessionId": updated["id"], "startedAt": updated["started_at"], "status": updated["status"]}
+
+
 @router.post("/{session_id}/items")
 def upsert_session_item(session_id: int, body: ItemUpsertReq):
     """Add or update item count for a session."""
@@ -53,7 +92,7 @@ def upsert_session_item(session_id: int, body: ItemUpsertReq):
                 INSERT INTO session_item (session_id, ball_type_id, count)
                 VALUES (%s, %s, %s)
                 ON CONFLICT (session_id, ball_type_id)
-                DO UPDATE SET count = EXCLUDED.count
+                DO UPDATE SET count = session_item.count + EXCLUDED.count
                 """,
                 (session_id, body.ballTypeId, body.count),
             )

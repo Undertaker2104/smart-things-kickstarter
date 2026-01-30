@@ -21,7 +21,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
-  CREATE TYPE command_status AS ENUM ('PENDING','CLAIMED','FAILED','SUCCESS');
+  CREATE TYPE command_status AS ENUM ('PENDING','CLAIMED','FAILED');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 
@@ -64,9 +64,15 @@ CREATE TABLE IF NOT EXISTS command (
   created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   type           command_type NOT NULL,
   command_status command_status NOT NULL DEFAULT 'PENDING',
+  session_id     INT REFERENCES cleaning_session(id) ON DELETE CASCADE,
   acked_at       TIMESTAMPTZ,
   error_message  TEXT
 );
+
+-- Add session_id column to existing command table (if it doesn't exist)
+DO $$ BEGIN
+  ALTER TABLE command ADD COLUMN IF NOT EXISTS session_id INT REFERENCES cleaning_session(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_column THEN NULL; END $$;
 
 -- Expected inventory: user-configurable expected counts per ball type
 CREATE TABLE IF NOT EXISTS inventory_expected (
