@@ -13,13 +13,26 @@
 .app-width-container {
   flex: 1;
   width: 100%;
-  max-width: 650px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   background-color: var(--content);
 }
+
+@media (min-width: 700px) {
+  .app-width-container {
+    flex: 1;
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--content);
+  }
+}
+
 
 .main-content {
   flex: 1;
