@@ -132,7 +132,7 @@ const InventoryPage = () => {
                             <div className="inventory-total-right">
                                 <div className="inventory-divider-line" />
                                 <div className="inventory-total-text">
-                                    <p>total</p>
+                                    <p className="total">total</p>
                                     <div className="inventory-total-values">
                                         <p>{session ? totalSession : '—'}</p>
                                         <p>/</p>
