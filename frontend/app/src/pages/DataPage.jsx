@@ -188,7 +188,10 @@ const DataPage = () => {
     if (loading) {
         return (
             <div className="data-page">
-                <h1>Sphaera One</h1>
+                <div className="title">
+                <h1>Sphaera</h1>
+                <h1 className='notBold'>One</h1>
+            </div>
                 <div className="loading">Charts laden...</div>
             </div>
         )
@@ -207,7 +210,10 @@ const DataPage = () => {
 
     return (
         <div className="data-page">
-            <h1>Sportini Cleani</h1>
+            <div className="title">
+                <h1>Sphaera</h1>
+                <h1 className='notBold'>One</h1>
+            </div>
             <div className="data-content">
                 <DataCards sessionsThisWeek={sessionsThisWeek} cleanedToday={cleanedToday} />
                 <div className="chart-container">
