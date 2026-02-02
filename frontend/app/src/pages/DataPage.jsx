@@ -188,7 +188,7 @@ const DataPage = () => {
     if (loading) {
         return (
             <div className="data-page">
-                <h1>Sportini Cleani</h1>
+                <h1>Sphaera One</h1>
                 <div className="loading">Charts laden...</div>
             </div>
         )

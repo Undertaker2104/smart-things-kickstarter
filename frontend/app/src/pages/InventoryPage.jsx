@@ -110,7 +110,7 @@ const InventoryPage = () => {
 
     return (
         <div className="status-page">
-            <h1>Sportini Cleani</h1>
+            <h1>Sphaera One</h1>
             <div className="status-content">
                 <div className="status-inventory">
                     <div className="inventory-header">

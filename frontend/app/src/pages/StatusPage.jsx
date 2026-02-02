@@ -154,7 +154,7 @@ const StatusPage = () => {
 
     return (
         <div className="status-page">
-            <h1>Sportini Cleani</h1>
+            <h1>Sphaera One</h1>
             <div className="status-card">
                 <div className="status-top">
                     <h2>Status: {statusText}</h2>
