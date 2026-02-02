@@ -5,6 +5,25 @@
     overflow: hidden;
 }
 
+.title {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0px;
+    padding: 0px 0px 0 0px;
+    margin-bottom: 20px;
+    word-spacing: -10px;
+}
+
+.notBold {
+    font-weight: lighter;
+    margin-left: -30px !important;
+}
+
+h1.notBold {
+    margin-left: -40px;
+}
+
 .data-page h1 {
     margin: 0;
     padding: 20px 20px 0 20px;

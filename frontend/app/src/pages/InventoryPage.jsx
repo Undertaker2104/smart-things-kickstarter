@@ -109,10 +109,13 @@ const InventoryPage = () => {
     }
 
     return (
-        <div className="status-page">
-            <h1>Sphaera One</h1>
-            <div className="status-content">
-                <div className="status-inventory">
+        <div className="inventory-page">
+            <div className="title">
+                <h1>Sphaera</h1>
+                <h1 className='notBold'>One</h1>
+            </div>
+            <div className="inventory-content">
+                <div className="inventory-inventory">
                     <div className="inventory-header">
                         <h2>Inventory</h2>
                         <div className="inventory-unit">
