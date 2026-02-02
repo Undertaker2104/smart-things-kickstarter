@@ -1,0 +1,132 @@
+.inventory-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--modal-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.inventory-modal-content {
+    background: var(--modal-content);
+    border-radius: 12px;
+    padding: 24px;
+    min-width: 320px;
+    max-width: 90vw;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+}
+
+.inventory-modal-content h2 {
+    color: var(--modal-text);
+    margin: 0 0 4px 0;
+    font-size: 1.5rem;
+}
+
+.inventory-modal-subtitle {
+    color: var(--modal-text-secondary);
+    margin: 0 0 20px 0;
+    font-size: 0.9rem;
+}
+
+.inventory-modal-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.inventory-modal-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--info);
+    padding: 12px 16px;
+    border-radius: 8px;
+}
+
+.inventory-modal-item-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.inventory-modal-item-label svg {
+    flex-shrink: 0;
+}
+
+.inventory-modal-input {
+    width: 80px;
+    padding: 8px 12px;
+    border: 1px solid var(--modal-text-secondary);
+    border-radius: 6px;
+    font-size: 1rem;
+    text-align: center;
+    background: var(--modal-content);
+    color: var(--modal-text);
+}
+
+.inventory-modal-input:focus {
+    outline: none;
+    border-color: var(--modal-button);
+}
+
+.inventory-modal-input::-webkit-outer-spin-button,
+.inventory-modal-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.inventory-modal-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.inventory-modal-input-error {
+    border-color: var(--error);
+}
+
+.inventory-modal-input-error:focus {
+    border-color: var(--error);
+}
+
+.inventory-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+.inventory-modal-button {
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s;
+}
+
+.inventory-modal-button:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.inventory-modal-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.inventory-modal-cancel {
+    background: transparent;
+    color: var(--modal-text);
+    border: 1px solid var(--modal-text-secondary);
+}
+
+.inventory-modal-save {
+    background: var(--modal-button);
+    color: var(--modal-content);
+}
