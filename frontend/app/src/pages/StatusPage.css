@@ -41,7 +41,7 @@
 
     .session-unit {
         margin-left: 20px;
-        margin-right: 40px;
+        margin-right: 0px;
         gap: 70px;
         display: flex;
         flex-direction: row;
@@ -182,6 +182,7 @@
 
 .session-header p {
     margin: 0px;
+    align-items: flex-end;
 }
 
 .session-ball {
