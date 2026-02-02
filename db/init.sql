@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS cleaning_session (
   id           SERIAL PRIMARY KEY,
   started_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   ended_at     TIMESTAMPTZ,
-  status       session_status NOT NULL DEFAULT 'RUNNING'
+  status       session_status NOT NULL DEFAULT 'FINISHED'
 );
 
 CREATE TABLE IF NOT EXISTS session_item (

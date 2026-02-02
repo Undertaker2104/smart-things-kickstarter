@@ -59,6 +59,18 @@ export const inventoryAPI = {
             throw new Error('Failed to fetch inventory')
         }
         return response.json()
+    },
+
+    updateInventory: async (ballTypeId, expectedCount) => {
+        const response = await fetch(`${API_BASE_URL}/api/inventory/${ballTypeId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ expected_count: expectedCount })
+        })
+        if (!response.ok) {
+            throw new Error('Failed to update inventory')
+        }
+        return response.json()
     }
 }
 
