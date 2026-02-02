@@ -1,4 +1,5 @@
 export const API_BASE_URL = "http://145.24.237.126:8000";
+//export const API_BASE_URL = "http://localhost:8000"
 fetch(`{API_BASE_URL}/api/charts/expected-vs-counted`)
 
 // Chart API endpoints
@@ -28,6 +29,14 @@ export const sessionAPI = {
             throw new Error('Failed to fetch sessions')
         }
         return response.json()
+    },
+
+    getSessionDetail: async (sessionId) => {
+        const response = await fetch(`${API_BASE_URL}/api/sessions/${sessionId}`)
+        if (!response.ok) {
+            throw new Error('Failed to fetch session detail')
+        }
+        return response.json()
     }
 }
 
@@ -48,6 +57,34 @@ export const inventoryAPI = {
         const response = await fetch(`${API_BASE_URL}/api/inventory`)
         if (!response.ok) {
             throw new Error('Failed to fetch inventory')
+        }
+        return response.json()
+    }
+}
+
+// Command API endpoints
+export const commandAPI = {
+    createCommand: async (type, sessionId = null) => {
+        const body = { type }
+        if (sessionId !== null) {
+            body.session_id = sessionId
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/commands`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        if (!response.ok) {
+            throw new Error('Failed to create command')
+        }
+        return response.json()
+    },
+
+    getCommandStatus: async (commandId) => {
+        const response = await fetch(`${API_BASE_URL}/api/commands/${commandId}`)
+        if (!response.ok) {
+            throw new Error('Failed to get command status')
         }
         return response.json()
     }
