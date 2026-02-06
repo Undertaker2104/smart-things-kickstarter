@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="nl">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ESP32 Camera + Teachable Machine</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 16px;
+      line-height: 1.3
+    }
+
+    .row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-start
+    }
+
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 12px;
+      max-width: 520px
+    }
+
+    button {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: #f7f7f7;
+      cursor: pointer
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed
+    }
+
+    #live {
+      width: 320px;
+      max-width: 100%;
+      border-radius: 12px;
+      border: 1px solid #ddd
+    }
+
+    #labels .prediction-row {
+      margin: 8px 0
+    }
+
+    #labels .pred-label {
+      font-weight: 500;
+      margin-bottom: 4px;
+      font-size: 14px
+    }
+
+    #labels .bar-container {
+      background: #e0e0e0;
+      border-radius: 8px;
+      height: 24px;
+      overflow: hidden;
+      position: relative
+    }
+
+    #labels .bar-fill {
+      background: linear-gradient(90deg, #4CAF50, #8BC34A);
+      height: 100%;
+      transition: width 0.3s ease;
+      border-radius: 8px
+    }
+
+    #labels .bar-text {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      font-weight: 600;
+      color: #333
+    }
+
+    small {
+      color: #666
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace
+    }
+  </style>
+</head>
+
+<body>
+  <h2>ESP32 Camera + Teachable Machine</h2>
+  <div class="row">
+    <div class="card">
+      <div><b>Live beeld</b> <small>(MJPEG stream)</small></div>
+      <img id="live" crossorigin="anonymous" alt="stream" />
+      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+        <button id="btnLoad">Load model</button>
+        <button id="btnStart" disabled>Start AI</button>
+        <button id="btnStop" disabled>Stop AI</button>
+        <button id="btnAnalyze" disabled>Analyse (3s)</button>
+      </div>
+      <div style="margin-top:8px"><small>Model URL: <span class="mono" id="modelUrl"></span></small></div>
+      <div style="margin-top:8px"><small>Status: <span id="status">idle</span></small></div>
+    </div>
+
+    <div class="card">
+      <div><b>Voorspellingen</b></div>
+      <div id="labels"></div>
+    </div>
+  </div>
+
+  <canvas id="work" width="224" height="224" style="display:none"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+  <script>
+    (function () {
+      const MODEL_BASE = "/my_model/"; // wordt door de ESP32 geserveerd (embedded)
+      document.getElementById("modelUrl").textContent = MODEL_BASE;
+
+      const live = document.getElementById("live");
+      const statusEl = document.getElementById("status");
+      const labelsEl = document.getElementById("labels");
+      const btnLoad = document.getElementById("btnLoad");
+      const btnStart = document.getElementById("btnStart");
+      const btnStop = document.getElementById("btnStop");
+      const btnAnalyze = document.getElementById("btnAnalyze");
+      const canvas = document.getElementById("work");
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+      // stream draait op de "stream_httpd" (meestal :81)
+      const streamUrl = `${location.protocol}//${location.hostname}:81/stream`;
+      live.src = streamUrl;
+
+      let model = null;
+      let maxPred = 0;
+      let running = false;
+      let lastTs = 0;
+      let analyzing = false;
+      let analysisLabel = null;
+      let analysisStart = 0;
+
+      function setStatus(s) { statusEl.textContent = s; }
+
+      async function loadModel() {
+        // Check if Teachable Machine library is loaded
+        if (typeof tmImage === 'undefined') {
+          throw new Error("Teachable Machine library not loaded. Check your internet connection.");
+        }
+        setStatus("loading model...");
+        const modelURL = MODEL_BASE + "model.json";
+        const metadataURL = MODEL_BASE + "metadata.json";
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPred = model.getTotalClasses();
+        labelsEl.innerHTML = "";
+        for (let i = 0; i < maxPred; i++) {
+          const row = document.createElement("div");
+          row.className = "prediction-row";
+          row.innerHTML = `
+          <div class="pred-label" data-idx="${i}">-</div>
+          <div class="bar-container">
+            <div class="bar-fill" data-idx="${i}" style="width:0%"></div>
+            <div class="bar-text" data-idx="${i}">0%</div>
+          </div>
+        `;
+          labelsEl.appendChild(row);
+        }
+        setStatus("model loaded");
+        btnStart.disabled = false;
+      }
+
+      async function predictLoop(ts) {
+        if (!running) return;
+        // throttle: ~4 FPS om je ESP32 + browser niet te slopen
+        if (ts - lastTs < 250) { requestAnimationFrame(predictLoop); return; }
+        lastTs = ts;
+
+        try {
+          // teken huidige frame van de stream naar canvas
+          const w = live.naturalWidth || live.width;
+          const h = live.naturalHeight || live.height;
+          if (w && h) {
+            ctx.drawImage(live, 0, 0, canvas.width, canvas.height);
+            const pred = await model.predict(canvas);
+
+            let maxProb = 0;
+            let maxLabel = "";
+
+            for (let i = 0; i < maxPred; i++) {
+              const percentage = Math.round(pred[i].probability * 100);
+              const label = labelsEl.querySelector(`.pred-label[data-idx="${i}"]`);
+              const barFill = labelsEl.querySelector(`.bar-fill[data-idx="${i}"]`);
+              const barText = labelsEl.querySelector(`.bar-text[data-idx="${i}"]`);
+
+              label.textContent = pred[i].className;
+              barFill.style.width = percentage + "%";
+              barText.textContent = percentage + "%";
+
+              if (pred[i].probability > maxProb) {
+                maxProb = pred[i].probability;
+                maxLabel = pred[i].className;
+              }
+            }
+
+            // Check for stable prediction during analysis
+            if (analyzing) {
+              checkStablePrediction(maxLabel, maxProb);
+            }
+          }
+        } catch (e) {
+          // vaak CORS/tainted canvas als headers ontbreken; dan zie je dit in status
+          setStatus("predict error: " + (e && e.message ? e.message : e));
+        }
+        requestAnimationFrame(predictLoop);
+      }
+
+      function checkStablePrediction(label, prob) {
+        const now = Date.now();
+
+        if (analysisLabel === null) {
+          analysisLabel = label;
+          analysisStart = now;
+          setStatus(`analysing: ${label}...`);
+          return;
+        }
+
+        if (label !== analysisLabel) {
+          console.log("Analysis failed: label changed");
+          analyzing = false;
+          analysisLabel = null;
+          btnAnalyze.disabled = false;
+          setStatus("running (label changed)");
+          return;
+        }
+
+        if (now - analysisStart >= 3000) {
+          analyzing = false;
+          sendAnalysis(label, prob);
+        }
+      }
+
+      async function sendAnalysis(label, prob) {
+        console.log("Stable prediction:", label);
+        setStatus(`sending: ${label}...`);
+
+        try {
+          const response = await fetch("/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prediction: label,
+              probability: prob
+            })
+          });
+
+          if (response.ok) {
+            console.log("Analysis sent successfully");
+            setStatus(`✓ sent: ${label}`);
+          } else {
+            console.error("Failed to send analysis:", response.status);
+            setStatus(`✗ failed to send`);
+          }
+        } catch (error) {
+          console.error("Error sending analysis:", error);
+          setStatus(`✗ error: ${error.message}`);
+        }
+
+        btnAnalyze.disabled = false;
+      }
+
+      btnLoad.addEventListener("click", async () => {
+        btnLoad.disabled = true;
+        try { await loadModel(); }
+        catch (e) { setStatus("load error: " + (e && e.message ? e.message : e)); btnLoad.disabled = false; }
+      });
+
+      btnStart.addEventListener("click", () => {
+        if (!model) { setStatus("load eerst het model"); return; }
+        running = true;
+        btnStart.disabled = true;
+        btnStop.disabled = false;
+        btnAnalyze.disabled = false;
+        setStatus("running");
+        requestAnimationFrame(predictLoop);
+      });
+
+      btnStop.addEventListener("click", () => {
+        running = false;
+        analyzing = false;
+        btnStart.disabled = false;
+        btnStop.disabled = true;
+        btnAnalyze.disabled = true;
+        setStatus("stopped");
+      });
+
+      btnAnalyze.addEventListener("click", () => {
+        if (!running) {
+          setStatus("start AI eerst");
+          return;
+        }
+        analyzing = true;
+        analysisLabel = null;
+        analysisStart = 0;
+        btnAnalyze.disabled = true;
+        setStatus("analysing...");
+        console.log("Analysis started");
+      });
+
+      // NEW: Auto-trigger polling - checks if display requested analysis
+      async function checkTrigger() {
+        if (!running || analyzing) return; // Only trigger if running and not already analyzing
+        
+        try {
+          const response = await fetch("/check_trigger");
+          const data = await response.json();
+          
+          if (data.trigger === true) {
+            console.log("[AUTO-TRIGGER] Display requested analysis");
+            analyzing = true;
+            analysisLabel = null;
+            analysisStart = 0;
+            btnAnalyze.disabled = true;
+            setStatus("auto-analysing...");
+          }
+        } catch (error) {
+          console.error("Error checking trigger:", error);
+        }
+      }
+
+      // Poll every 500ms for trigger requests from display
+      setInterval(checkTrigger, 500);
+
+      console.log("Auto-trigger system initialized - polling every 500ms");
+    })();
+  </script>
+</body>
+
+</html>
