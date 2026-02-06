@@ -1,0 +1,287 @@
+#include <Wire.h>
+#include <SPI.h>
+#include <XPT2046_Touchscreen.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_ILI9341.h>
+#include <AccelStepper.h>
+
+// =====================
+// UART CONFIG (was I2C)
+// =====================
+#define RX_PIN 44  // Display RX <- Camera TX
+#define TX_PIN 43  // Display TX (not used)
+
+volatile int ballDetected = 0; // 0=none, 1=soccer, 2=volleyball, 3=basketball
+volatile bool newBallData = false;
+
+// =====================
+// TFT CONFIG
+// =====================
+#define TFT_CS  10
+#define TFT_DC  9
+#define TFT_RST 8
+#define PIN_SCK  12
+// =====================
+// TOUCHSCREEN CONFIG
+// =====================
+#define TOUCH_CS 3
+#define TOUCH_IRQ 21
+// =====================
+// MOTOR CONTROL
+// =====================
+void setMotorSpeed(int speed) {
+  motorSpeed = constrain(speed, -255, 255);
+  
+  if (motorSpeed > 0) {
+    analogWrite(RPWM_PIN, motorSpeed);
+    analogWrite(LPWM_PIN, 0);
+  } else if (motorSpeed < 0) {
+    analogWrite(RPWM_PIN, 0);
+    analogWrite(LPWM_PIN, abs(motorSpeed));
+  } else {
+    analogWrite(RPWM_PIN, 0);
+    analogWrite(LPWM_PIN, 0);
+  }
+}
+
+void stopMotor() {
+  setMotorSpeed(0);
+}
+
+// =====================
+// IR SENSOR
+// =====================
+bool readIrRawDetected() {
+  return digitalRead(IR_SENSOR_PIN) == LOW;
+}
+
+void updateIrState() {
+  if (readIrRawDetected()) {
+    lastIrDetection = millis();
+  }
+}
+
+bool isIrDetected() {
+  return (millis() - lastIrDetection) < 100;
+}
+
+// =====================
+// UI DRAWING
+// =====================
+void drawMainScreen() {
+  tft.fillScreen(ILI9341_BLACK);
+  
+  // Title
+  tft.setTextColor(ILI9341_WHITE);
+  tft.setTextSize(2);
+  tft.setCursor(80, 10);
+  tft.print("MOTOR CONTROL");
+  
+  // Ball detection status
+  tft.setCursor(10, 40);
+  tft.setTextSize(2);
+  switch(ballDetected) {
+    case 1:
+      tft.setTextColor(ILI9341_GREEN);
+      tft.print("SOCCER BALL");
+      break;
+    case 2:
+      tft.setTextColor(ILI9341_CYAN);
+      tft.print("VOLLEYBALL");
+      break;
+    case 3:
+      tft.setTextColor(ILI9341_ORANGE);
+      tft.print("BASKETBALL");
+      break;
+    default:
+      tft.setTextColor(ILI9341_YELLOW);
+      tft.print("NO BALL");
+  }
+  
+  // IR Status
+  tft.setCursor(10, 70);
+  tft.setTextColor(ILI9341_WHITE);
+  tft.print("IR: ");
+  if (isIrDetected()) {
+    tft.setTextColor(ILI9341_GREEN);
+    tft.print("DETECTED");
+  } else {
+    tft.setTextColor(ILI9341_RED);
+    tft.print("CLEAR");
+  }
+  
+  // Motor SpeedMotor Control System ===");
+  
+  // UART setup for receiving ball detection data
+  Serial2.begin(9600, SERIAL_8N1, RX_PIN, TX_PIN);
+  Serial.println("[UART] Initialized for ball detection");
+  
+  // Motor pins
+  pinMode(RPWM_PIN, OUTPUT);
+  pinMode(LPWM_PIN, OUTPUT);
+  pinMode(IR_SENSOR_PIN, INPUT_PULLUP);
+  
+  // Stepper setup
+  stepper.setMaxSpeed(1000);
+  stepper.setAcceleration(500);
+  
+  // TFT setup
+  SPI.begin(PIN_SCK, PIN_MISO, PIN_MOSI);
+  tft.begin();
+  tft.setRotation(1);
+  Update = 0;
+  
+  // Update IR sensor state
+  updateIrState();
+  
+  // Check for incoming UART ball detection data
+  if (Serial2.available() > 0) {
+    int received = Serial2.read();
+    if (received != ballDetected) {
+      ballDetected = received;
+      newBallData = true;
+      
+      Serial.print("[UART] Ball detected: ");
+      switch(ballDetected) {
+        case 1: Serial.println("SOCCER"); break;
+        case 2: Serial.println("VOLLEYBALL"); break;
+        case 3: Serial.println("BASKETBALL"); break;
+        default: Serial.println("NONE"); break;
+      }
+      
+      updateDisplay();
+    }
+  }
+  
+  // Handle touchscreen
+  if (touchEnabled && touch.touched()) {
+    TS_Point p = touch.getPoint();
+    
+    // Map touch coordinates to screen
+    int x = map(p.x, 200, 3700, 0, 320);
+    int y = map(p.y, 300, 3800, 0, 240);
+    
+    // Check button presses
+    if (y >= 160 && y <= 210) {
+      if (x >= 10 && x <= 100) {
+        // START button
+        setMotorSpeed(150);
+        Serial.println("Motor START");
+        delay(200);
+        updateDisplay();
+      }
+      else if (x >= 120 && x <= 210) {
+        // STOP button
+        stopMotor();
+        Serial.println("Motor STOP");
+        delay(200);
+        updateDisplay();
+      }
+      else if (x >= 230 && x <= 310) {
+        // TOGGLE TOUCH button
+        touchEnabled = false;
+        Serial.println("Touch DISABLED");
+        delay(200);
+        updateDisplay();
+      }
+    }
+  }
+  
+  // Run stepper
+  stepper.run();
+  
+  // Periodic display update (every 500ms)
+  if (millis() - lastUpdate > 500) {
+    lastUpdate = millis();
+    if (newBallData) {
+      newBallData = false;
+      updateDisplay();
+    }
+  tft.print("STOP");
+  
+  tft.fillRect(230, 160, 80, 50, ILI9341_BLUE);
+  tft.setCursor(240, 175);
+  tft.setTextSize(1);
+  tft.setTextColor(ILI9341_WHITE);
+  tft.print("TOGGLE");
+  tft.setCursor(245, 190);
+  tft.print("TOUCH");
+}
+
+void updateDisplay() {
+  drawMainScreen();ft.setTextSize(5);
+  tft.setCursor(80, 100);
+  tft.print(value);
+  
+  // Decode ball types
+  tft.setTextColor(ILI9341_WHITE);
+  tft.setTextSize(2);
+  tft.setCursor(30, 180);
+  
+  switch(value) {
+    case 0:
+      tft.print("NONE");
+      break;
+    case 1:
+      tft.setTextColor(ILI9341_GREEN);
+      tft.print("SOCCER BALL");
+      break;
+    case 2:
+      tft.setTextColor(ILI9341_CYAN);
+      tft.print("VOLLEYBALL");
+      break;
+    case 3:
+      tft.setTextColor(ILI9341_ORANGE);
+      tft.print("BASKETBALL");
+      break;
+    default:
+      tft.print("Unknown: ");
+      tft.print(value);
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(100);
+  
+  Serial.println("\n\n=== UART Receiver Test ===");
+  
+  // UART setup for receiving data
+  Serial2.begin(9600, SERIAL_8N1, RX_PIN, TX_PIN);
+  Serial.println("[UART] Receiver initialized");
+  Serial.print("[UART] RX Pin: GPIO");
+  Serial.println(RX_PIN);
+  
+  // TFT setup
+  SPI.begin(PIN_SCK, PIN_MISO, PIN_MOSI);
+  tft.begin();
+  tft.setRotation(1);
+  
+  drawIdleScreen();
+  
+  Serial.println("Ready! Waiting for UART data...\n");
+}
+
+void loop() {
+  static unsigned long lastPrint = 0;
+  
+  // Periodic status
+  if (millis() - lastPrint > 3000) {
+    lastPrint = millis();
+    Serial.print("[Status] Running... Last value: ");
+    Serial.println(receivedValue);
+  }
+  
+  // Check for incoming UART data
+  if (Serial2.available() > 0) {
+    receivedValue = Serial2.read();
+    newData = true;
+    
+    Serial.print("[UART RX] Received: ");
+    Serial.println(receivedValue);
+    
+    drawReceivedValue(receivedValue);
+  }
+  
+  delay(10);
+}
