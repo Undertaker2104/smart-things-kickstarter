@@ -1,4 +1,3 @@
-"""State endpoint for dashboard to read current system state."""
 from fastapi import APIRouter
 
 from database import get_db_connection
@@ -8,10 +7,6 @@ router = APIRouter(prefix="/api", tags=["state"])
 
 @router.get("/state")
 def get_state():
-    """
-    Get current system state: latest session with its items and recent events.
-    Used by the dashboard for real-time display.
-    """
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(

@@ -1,4 +1,3 @@
-"""Ball Cleaner API - Main application entry point."""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,7 +11,6 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
 )
 
-# CORS middleware configuratie
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -35,7 +33,6 @@ app.include_router(inventory.router)
 
 @app.get("/")
 def read_root():
-    """Health check endpoint."""
     return {
         "status": "ok",
         "service": "Ball Cleaner API",

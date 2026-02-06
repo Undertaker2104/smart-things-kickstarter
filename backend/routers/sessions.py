@@ -1,4 +1,3 @@
-"""Session endpoints for ESP to API communication."""
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Query
 
@@ -10,7 +9,6 @@ router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 
 @router.post("/start")
 def start_session(body: StartSessionReq):
-    """Start a new cleaning session."""
     started_at = body.startedAt or datetime.now(timezone.utc).isoformat()
 
     with get_db_connection() as conn:
@@ -35,14 +33,8 @@ def start_session(body: StartSessionReq):
 
 @router.post("/resume")
 def resume_session():
-    """Resume the most-recent paused cleaning session.
-
-    Frontend calls this endpoint without a body (it resumes the latest PAUSED session).
-    Returns 404 if no paused session is found.
-    """
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            # Find the most recent paused session
             cur.execute(
                 """
                 SELECT id FROM cleaning_session
@@ -56,7 +48,6 @@ def resume_session():
                 raise HTTPException(status_code=404, detail="No paused session to resume")
             session_id = row["id"]
 
-            # Resume: set status back to RUNNING and clear ended_at
             cur.execute(
                 """
                 UPDATE cleaning_session
@@ -74,15 +65,12 @@ def resume_session():
 
 @router.post("/{session_id}/items")
 def upsert_session_item(session_id: int, body: ItemUpsertReq):
-    """Add or update item count for a session."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            # Validate session exists
             cur.execute("SELECT 1 FROM cleaning_session WHERE id=%s", (session_id,))
             if cur.fetchone() is None:
                 raise HTTPException(status_code=404, detail="Session not found")
 
-            # Validate ball type exists
             cur.execute("SELECT 1 FROM ball_type WHERE id=%s", (body.ballTypeId,))
             if cur.fetchone() is None:
                 raise HTTPException(status_code=400, detail="Ball type not found")
@@ -103,7 +91,6 @@ def upsert_session_item(session_id: int, body: ItemUpsertReq):
 
 @router.post("/{session_id}/events")
 def add_event(session_id: int, body: EventCreateReq):
-    """Add an event to a session."""
     timestamp = body.timestamp or datetime.now(timezone.utc).isoformat()
 
     with get_db_connection() as conn:
@@ -128,7 +115,6 @@ def add_event(session_id: int, body: EventCreateReq):
 
 @router.post("/{session_id}/stop")
 def stop_session(session_id: int, body: StopSessionReq):
-    """Stop a cleaning session."""
     ended_at = body.endedAt or datetime.now(timezone.utc).isoformat()
 
     with get_db_connection() as conn:
@@ -150,7 +136,6 @@ def stop_session(session_id: int, body: StopSessionReq):
 
 @router.get("")
 def list_sessions(limit: int = Query(default=20, ge=1, le=200)):
-    """List recent cleaning sessions."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -169,7 +154,6 @@ def list_sessions(limit: int = Query(default=20, ge=1, le=200)):
 
 @router.get("/{session_id}")
 def get_session_detail(session_id: int):
-    """Get detailed information about a specific session."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(

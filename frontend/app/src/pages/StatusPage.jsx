@@ -113,14 +113,11 @@ const StatusPage = () => {
                 return
             }
 
-            // Start/Resume button clicked (same class used for Start and Resume)
             if (target.closest && target.closest('.startBut')) {
-                // if we already show a session and it's paused, flip to RUNNING
                 setSession(prev => prev && prev.status === 'PAUSED' ? { ...prev, status: 'RUNNING' } : prev)
                 return
             }
 
-            // Stop button clicked -> keep counts but show Idle (map to FINISHED)
             if (target.closest && target.closest('.stopBut')) {
                 setSession(prev => prev ? { ...prev, status: 'FINISHED' } : prev)
                 return
@@ -134,7 +131,6 @@ const StatusPage = () => {
         }
     }, [])
 
-    // Display rules: treat FINISHED as Idle (show last-session counts but UI reads as idle)
     const statusText = session
         ? (session.status === 'RUNNING' ? 'Cleaning'
             : session.status === 'PAUSED' ? 'Paused'
@@ -143,7 +139,6 @@ const StatusPage = () => {
                         : session.status)
         : 'Idle'
 
-    // Map FINISHED -> status-idle so the bar appears gray; other statuses keep their classes
     const statusClass = session
         ? (session.status === 'FINISHED' ? 'status-idle' : `status-${session.status ? session.status.toLowerCase() : 'idle'}`)
         : 'status-idle'
@@ -176,7 +171,6 @@ const StatusPage = () => {
                     </div>
 
                     <div className="session-ball-box">
-                        {/* Render per-ball-type rows from session items (fallback to 0) */}
                         <div className="session-ball">
                             <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="40px" fill={basketballColor}>
                                 <path d="M148-513.33h129.33q-6.66-44.67-26.33-84-19.67-39.34-49-68.67-21.33 33-36.17 71.17Q151-556.67 148-513.33Zm534.67 0H812q-3-43.34-17.83-81.5Q779.33-633 758-666q-31.33 31.33-50 69.67-18.67 38.33-25.33 83ZM202-294.67Q233.33-326 252-364t25.33-82.67H148q3 43.34 17.83 81.17 14.84 37.83 36.17 70.83Zm556 0q21.33-33 36.17-70.83Q809-403.33 812-446.67H682.67Q689.33-402 708-364q18.67 38 50 69.33ZM345.33-513.33h101.34V-812q-59 7.33-109.84 31.17-50.83 23.83-91.5 63.5 40.34 40 66.17 92.16 25.83 52.17 33.83 111.84Zm168 0h101.34q8-59.67 34.16-111.84 26.17-52.16 66.5-92.16-40.66-39.67-91.83-63.5-51.17-23.84-110.17-31.17v298.67ZM446.67-148v-298.67H345.33q-8 59.67-33.83 111.5-25.83 51.84-66.17 91.84 40.67 39.66 89.84 63.83 49.16 24.17 111.5 31.5Zm66.66 0q62.34-7.33 111.84-31.5t90.16-63.83q-40.33-40-66.5-91.84-26.16-51.83-34.16-111.5H513.33V-148ZM480-476.67ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z" />

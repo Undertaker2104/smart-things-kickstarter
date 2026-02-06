@@ -1,4 +1,3 @@
-"""Event-related Pydantic models."""
 from typing import Optional
 from pydantic import BaseModel, Field
 from .enums import LogLevel, EventCode

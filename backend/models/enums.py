@@ -1,7 +1,5 @@
-"""Enum type definitions matching database schema."""
 from typing import Literal
 
-# Enums matching init.sql
 SessionStatus = Literal["RUNNING", "PAUSED", "FINISHED", "ERROR"]
 LogLevel = Literal["INFO", "WARN", "ERROR"]
 EventCode = Literal["EMERGENCY_STOP", "FOREIGN_OBJECT", "JAM", "SENSOR_FAIL"]

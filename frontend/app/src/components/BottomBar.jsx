@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './BottomBar.css';
 import '../theme/colors.css';
@@ -14,25 +14,23 @@ import FinishedModal, { ErrorModal } from './FinishedModal';
 const BottomBar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [sessionStatus, setSessionStatus] = useState(null); // 'RUNNING', 'PAUSED', null
+    const [sessionStatus, setSessionStatus] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showFinishedModal, setShowFinishedModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [commandIds, setCommandIds] = useState([]); // Track command IDs for polling
+    const [commandIds, setCommandIds] = useState([]);
 
-    // Fetch session status
     useEffect(() => {
         const fetchSessions = async () => {
             try {
                 const sessions = await sessionAPI.getSessions();
                 if (Array.isArray(sessions) && sessions.length > 0) {
-                    // Get the latest session (assuming sorted by id DESC)
                     const latest = sessions[0];
                     if (latest.status === 'RUNNING' || latest.status === 'PAUSED') {
                         setSessionStatus(latest.status);
                     } else {
-                        setSessionStatus(null); // Always show Start Session if not running/paused
+                        setSessionStatus(null);
                     }
                 } else {
                     setSessionStatus(null);
@@ -44,7 +42,6 @@ const BottomBar = () => {
         fetchSessions();
     }, []);
 
-    // Poll command status for failures
     useEffect(() => {
         if (commandIds.length === 0) return;
 
@@ -56,13 +53,11 @@ const BottomBar = () => {
                         setErrorMessage(command.error_message || 'Command execution failed');
                         setShowErrorModal(true);
 
-                        // If the failed command references the session, refresh server state and reflect it in the UI.
                         (async () => {
                             try {
                                 const sessions = await sessionAPI.getSessions();
                                 const matching = Array.isArray(sessions) && sessions.find(s => s.id === command.session_id);
                                 if (matching) {
-                                    // Use authoritative server status (could already be ERROR, PAUSED, etc.)
                                     setSessionStatus(matching.status);
                                 }
                             } catch (e) {
@@ -70,7 +65,6 @@ const BottomBar = () => {
                             }
                         })();
 
-                        // Remove this command from tracking
                         setCommandIds(prev => prev.filter(id => id !== commandId));
                     }
                 }
@@ -79,16 +73,13 @@ const BottomBar = () => {
             }
         };
 
-        // Poll every 2 seconds
         const interval = setInterval(pollCommandStatuses, 2000);
         return () => clearInterval(interval);
     }, [commandIds]);
 
-    // Start session handler
     const handleStartSession = async () => {
         setLoading(true);
         try {
-            // Start the session first
             const sessionResponse = await fetch(`${API_BASE_URL}/api/sessions/start`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -97,14 +88,12 @@ const BottomBar = () => {
             const sessionData = await sessionResponse.json();
             const sessionId = sessionData.sessionId;
 
-            // Create START_CLEANING command for the microcontroller (don't wait)
             commandAPI.createCommand('START_CLEANING', sessionId).then(command => {
                 setCommandIds(prev => [...prev, command.id]);
             }).catch(err => {
                 console.error('Failed to create start command:', err);
             });
 
-            // Immediately update UI (optimistic) and notify other components
             setSessionStatus('RUNNING');
             window.dispatchEvent(new CustomEvent('sessionStatusChanged', { detail: { status: 'RUNNING', sessionId } }));
         } catch (err) {
@@ -115,7 +104,6 @@ const BottomBar = () => {
         setLoading(false);
     };
 
-    // Pause session handler (optimistic)
     const handlePauseSession = async () => {
         const prev = sessionStatus;
         if (sessionStatus === 'RUNNING') setSessionStatus('PAUSED');
@@ -125,14 +113,12 @@ const BottomBar = () => {
             const sessions = await sessionAPI.getSessions();
             const active = Array.isArray(sessions) && sessions.find(s => s.status === 'RUNNING');
             if (active) {
-                // Create STOP_CLEANING command for the microcontroller (don't wait)
                 commandAPI.createCommand('STOP_CLEANING', active.id).then(command => {
                     setCommandIds(prevIds => [...prevIds, command.id]);
                 }).catch(err => {
                     console.error('Failed to create pause command:', err);
                 });
 
-                // Persist server-side paused state (we already updated UI optimistically)
                 const endedAt = DateTime.now().setZone('Europe/Amsterdam').toISO();
                 await fetch(`${API_BASE_URL}/api/sessions/${active.id}/stop`, {
                     method: 'POST',
@@ -140,10 +126,8 @@ const BottomBar = () => {
                     body: JSON.stringify({ status: 'PAUSED', endedAt })
                 });
 
-                // keep optimistic PAUSED (server authoritative state will be picked up by polling)
                 window.dispatchEvent(new CustomEvent('sessionStatusChanged', { detail: { status: 'PAUSED', sessionId: active.id } }));
             } else {
-                // Nothing to pause on server — revert optimistic change
                 setSessionStatus(prev);
             }
         } catch (err) {
@@ -156,7 +140,6 @@ const BottomBar = () => {
         }
     };
 
-    // Resume session handler (optimistic)
     const handleResumeSession = async () => {
         const prev = sessionStatus;
         if (sessionStatus === 'PAUSED') setSessionStatus('RUNNING');
@@ -166,14 +149,12 @@ const BottomBar = () => {
             const sessions = await sessionAPI.getSessions();
             const paused = Array.isArray(sessions) && sessions.find(s => s.status === 'PAUSED');
             if (paused) {
-                // Create START_CLEANING command for the microcontroller (don't wait)
                 commandAPI.createCommand('START_CLEANING', paused.id).then(command => {
                     setCommandIds(prevIds => [...prevIds, command.id]);
                 }).catch(err => {
                     console.error('Failed to create resume command:', err);
                 });
 
-                // Persist server-side resume (UI already shows RUNNING)
                 await fetch(`${API_BASE_URL}/api/sessions/resume`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -182,7 +163,6 @@ const BottomBar = () => {
 
                 window.dispatchEvent(new CustomEvent('sessionStatusChanged', { detail: { status: 'RUNNING', sessionId: paused.id } }));
             } else {
-                // No paused session found remotely — revert optimistic change
                 setSessionStatus(prev);
             }
         } catch (err) {
@@ -195,7 +175,6 @@ const BottomBar = () => {
         }
     };
 
-    // Stop session handler (optimistic)
     const handleStopSession = async () => {
         const prev = sessionStatus;
         if (sessionStatus === 'RUNNING' || sessionStatus === 'PAUSED') {
@@ -207,14 +186,12 @@ const BottomBar = () => {
             const sessions = await sessionAPI.getSessions();
             const active = Array.isArray(sessions) && sessions.find(s => s.status === 'RUNNING' || s.status === 'PAUSED');
             if (active) {
-                // Create STOP_CLEANING command for the microcontroller (don't wait)
                 commandAPI.createCommand('STOP_CLEANING', active.id).then(command => {
                     setCommandIds(prevIds => [...prevIds, command.id]);
                 }).catch(err => {
                     console.error('Failed to create stop command:', err);
                 });
 
-                // Persist server-side FINISHED state
                 const endedAt = DateTime.now().setZone('Europe/Amsterdam').toISO();
                 await fetch(`${API_BASE_URL}/api/sessions/${active.id}/stop`, {
                     method: 'POST',
@@ -222,13 +199,10 @@ const BottomBar = () => {
                     body: JSON.stringify({ status: 'FINISHED', endedAt })
                 });
 
-                // show Finished modal only after server confirms
                 setShowFinishedModal(true);
 
-                // notify StatusPage: show Idle immediately but keep last-session counts
                 window.dispatchEvent(new CustomEvent('sessionStatusChanged', { detail: { status: null, sessionId: active.id } }));
             } else {
-                // nothing to stop remotely — revert optimistic change
                 setSessionStatus(prev);
             }
         } catch (err) {
