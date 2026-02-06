@@ -1,5 +1,4 @@
 export const API_BASE_URL = "http://145.24.237.126:8000";
-fetch(`{API_BASE_URL}/api/charts/expected-vs-counted`)
 
 export const chartAPI = {
     getExpectedVsCounted: async () => {

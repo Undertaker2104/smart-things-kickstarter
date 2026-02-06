@@ -27,5 +27,4 @@ __all__ = [
     "ItemUpsertReq",
     "EventCreateReq",
     "InventoryUpdateReq",
-    "InventoryUpdateReq",
 ]
