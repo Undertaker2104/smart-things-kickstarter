@@ -5,14 +5,8 @@ from psycopg.sql import SQL, Literal
 
 
 def create_balls_over_time_chart(days=7):
-    """
-    Line chart: Counted balls over time (last N days).
-    Shows total balls counted per session, stacked by ball type.
-    Returns: Plotly figure as JSON
-    """
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            # Get sessions from last N days with ball counts per type, aggregated by day
             query = SQL("""
                 SELECT 
                     DATE(cs.ended_at) as session_date,
@@ -28,21 +22,18 @@ def create_balls_over_time_chart(days=7):
             cur.execute(query)
             results = cur.fetchall()
     
-    # Organize data by ball type
     data_by_type = defaultdict(lambda: {'dates': [], 'counts': []})
     
     for row in results:
         ball_type = row['ball_type']
-        date = row['session_date']  # Date object from PostgreSQL
+        date = row['session_date']
         count = row['total_count']
         
-        # Format date as DD/MM
         formatted_date = date.strftime('%d/%m')
         
         data_by_type[ball_type]['dates'].append(formatted_date)
         data_by_type[ball_type]['counts'].append(count)
     
-    # Create stacked area chart
     fig = go.Figure()
     
     colors = {'Basketbal': '#e79426', 'Voetbal': '#4619ee', 'Volleybal': '#dbce18'}

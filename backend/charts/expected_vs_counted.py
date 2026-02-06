@@ -3,14 +3,8 @@ from database import get_db_connection
 
 
 def create_expected_vs_counted_chart():
-    """
-    Bar chart: Expected vs. Counted per ball type.
-    Shows delta as annotation (expected - counted).
-    Returns: Plotly figure as JSON
-    """
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            # Get expected counts and latest completed session counts
             cur.execute("""
                 SELECT 
                     bt.id,
@@ -33,7 +27,6 @@ def create_expected_vs_counted_chart():
             """)
             results = cur.fetchall()
     
-    # Prepare data
     ball_types = []
     expected = []
     counted = []
@@ -50,13 +43,11 @@ def create_expected_vs_counted_chart():
         counted.append(total_counted)
         deltas.append(delta)
     
-    # Create grouped bar chart
     fig = go.Figure(data=[
         go.Bar(name='Expected', x=ball_types, y=expected, marker_color='lightblue'),
         go.Bar(name='Counted', x=ball_types, y=counted, marker_color='darkblue')
     ])
     
-    # Add delta annotations
     for i, (ball_type, delta) in enumerate(zip(ball_types, deltas)):
         fig.add_annotation(
             x=ball_type,

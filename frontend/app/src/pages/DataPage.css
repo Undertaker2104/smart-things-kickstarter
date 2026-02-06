@@ -47,7 +47,6 @@ h1.notBold {
 
 .data-content::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari, Opera */
 }
 
 .chart-container {

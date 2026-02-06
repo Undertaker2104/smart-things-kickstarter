@@ -29,15 +29,13 @@ const DataPage = () => {
     useEffect(() => {
         loadCharts()
 
-        // Set up polling to refresh charts every 30 seconds
         const chartInterval = setInterval(() => {
             loadCharts()
-        }, 30000) // 30 seconds
+        }, 30000)
 
-        // Set up polling to refresh stats every 5 seconds
         const statsInterval = setInterval(() => {
             loadStatsOnly()
-        }, 5000) // 5 seconds
+        }, 5000)
 
         return () => {
             clearInterval(chartInterval)
@@ -67,14 +65,12 @@ const DataPage = () => {
                 chartAPI.getBallsOverTime(7)
             ])
 
-            // Transform Plotly data to Recharts format
             const barData = transformExpectedVsCounted(expectedVsCounted)
             const lineData = transformBallsOverTime(ballsOverTime)
 
             setExpectedVsCountedData(barData)
             setBallsOverTimeData(lineData)
 
-            // Calculate sessionsThisWeek and cleanedToday from ballsOverTime
             const { sessionsThisWeek: sessions, cleanedToday: cleaned } = calculateStats(ballsOverTime)
             setSessionsThisWeek(sessions)
             setCleanedToday(cleaned)
@@ -90,7 +86,6 @@ const DataPage = () => {
             return { sessionsThisWeek: 0, cleanedToday: 0 }
         }
 
-        // Get all unique dates from the chart data (already filtered to last 7 days by backend)
         const allDates = new Set()
         ballsOverTime.data.forEach(trace => {
             trace.x?.forEach(dateStr => {
@@ -99,7 +94,6 @@ const DataPage = () => {
         })
         const dates = Array.from(allDates).sort()
 
-        // Sessions this week: count days with any activity
         let sessionCount = 0
         dates.forEach(dateStr => {
             let any = false
@@ -112,7 +106,6 @@ const DataPage = () => {
             if (any) sessionCount++
         })
 
-        // Cleaned today: sum of all balls on today's date
         const today = new Date()
         const todayStr = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}`
         let cleaned = 0
@@ -141,7 +134,6 @@ const DataPage = () => {
         }))
     }
 
-    // Custom label to show delta on bars
     const renderDeltaLabel = (props) => {
         const { x, y, width, value, index } = props
         const delta = expectedVsCountedData[index]?.Delta || 0
@@ -162,7 +154,6 @@ const DataPage = () => {
     const transformBallsOverTime = (plotlyData) => {
         if (!plotlyData || !plotlyData.data || plotlyData.data.length === 0) return []
 
-        // Get all unique dates
         const allDates = new Set()
         plotlyData.data.forEach(trace => {
             trace.x?.forEach(date => allDates.add(date))
@@ -170,7 +161,6 @@ const DataPage = () => {
 
         const dates = Array.from(allDates).sort()
 
-        // Transform to recharts format
         return dates.map(date => {
             const dataPoint = { date }
             plotlyData.data.forEach(trace => {
@@ -189,9 +179,9 @@ const DataPage = () => {
         return (
             <div className="data-page">
                 <div className="title">
-                <h1>Sphaera</h1>
-                <h1 className='notBold'>One</h1>
-            </div>
+                    <h1>Sphaera</h1>
+                    <h1 className='notBold'>One</h1>
+                </div>
                 <div className="loading">Charts laden...</div>
             </div>
         )
@@ -235,7 +225,6 @@ const DataPage = () => {
                     </ResponsiveContainer>
                 </div>
 
-                {/* Balls Over Time Chart */}
                 <div className="chart-container">
                     <h2>Balls cleaned over time (7 days)</h2>
                     <ResponsiveContainer width="100%" height={400}>

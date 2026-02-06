@@ -55,14 +55,11 @@ h1.notBold {
     padding-top: 0px;
     padding-bottom: 60px;
     scrollbar-width: none;
-    /* Firefox */
     -ms-overflow-style: none;
-    /* IE and Edge */
 }
 
 .status-content::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari, Opera */
 }
 
 .empty {
@@ -138,7 +135,6 @@ h1.notBold {
 .inventory-ball {
     background-color: var(--info);
     height: 45px;
-    /* margin: 20px; */
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: 15px;
@@ -146,7 +142,6 @@ h1.notBold {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     align-items: center;
-    /* justify-content: center; */
     display: flex;
     flex-direction: row;
     gap: 20px;
@@ -256,15 +251,12 @@ h1.notBold {
         padding-top: 0px;
         padding-bottom: 60px;
         scrollbar-width: none;
-        /* Firefox */
         -ms-overflow-style: none;
-        /* IE and Edge */
     }
 
     .inventory-ball {
         background-color: var(--info);
         height: 45px;
-        /* margin: 20px; */
         padding-top: 10px;
         padding-bottom: 10px;
         padding-left: 30px;
@@ -272,7 +264,6 @@ h1.notBold {
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         align-items: center;
-        /* justify-content: center; */
         display: flex;
         flex-direction: row;
         gap: 30px;
@@ -291,7 +282,6 @@ h1.notBold {
     .inventory-ball {
         background-color: var(--info);
         height: 45px;
-        /* margin: 20px; */
         padding-top: 10px;
         padding-bottom: 10px;
         padding-left: 30px;
@@ -299,7 +289,6 @@ h1.notBold {
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         align-items: center;
-        /* justify-content: center; */
         display: flex;
         flex-direction: row;
         gap: 30px;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './InventoryModal.css';
 
 const InventoryModal = ({ open, onClose, inventory, onSave }) => {
@@ -7,7 +7,6 @@ const InventoryModal = ({ open, onClose, inventory, onSave }) => {
     const [errorIds, setErrorIds] = useState([]);
     const [wasOpen, setWasOpen] = useState(false);
 
-    // Initialize values only when modal opens (not on inventory refresh)
     useEffect(() => {
         if (open && !wasOpen && inventory) {
             const initial = {};
@@ -20,7 +19,6 @@ const InventoryModal = ({ open, onClose, inventory, onSave }) => {
         setWasOpen(open);
     }, [open, inventory, wasOpen]);
 
-    // Clear error only when modal opens (not on inventory refresh)
     useEffect(() => {
         if (open) {
             setErrorIds([]);
@@ -48,7 +46,6 @@ const InventoryModal = ({ open, onClose, inventory, onSave }) => {
             if (err.failedIds) {
                 setErrorIds(err.failedIds);
             } else {
-                // If generic error, mark all as failed
                 setErrorIds(Object.keys(values).map(id => parseInt(id, 10)));
             }
         } finally {

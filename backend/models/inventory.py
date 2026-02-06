@@ -1,4 +1,3 @@
-"""Inventory-related Pydantic models."""
 from pydantic import BaseModel, Field
 
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import './FinishedModal.css';
 
 const FinishedModal = ({ open, onClose }) => {

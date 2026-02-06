@@ -1,8 +1,6 @@
 export const API_BASE_URL = "http://145.24.237.126:8000";
-//export const API_BASE_URL = "http://localhost:8000"
 fetch(`{API_BASE_URL}/api/charts/expected-vs-counted`)
 
-// Chart API endpoints
 export const chartAPI = {
     getExpectedVsCounted: async () => {
         const response = await fetch(`${API_BASE_URL}/api/charts/expected-vs-counted`)
@@ -21,7 +19,6 @@ export const chartAPI = {
     }
 }
 
-// Session API endpoints
 export const sessionAPI = {
     getSessions: async () => {
         const response = await fetch(`${API_BASE_URL}/api/sessions`)
@@ -40,7 +37,6 @@ export const sessionAPI = {
     }
 }
 
-// State API endpoints
 export const stateAPI = {
     getState: async () => {
         const response = await fetch(`${API_BASE_URL}/api/state`)
@@ -51,7 +47,6 @@ export const stateAPI = {
     }
 }
 
-// Inventory API endpoints
 export const inventoryAPI = {
     getInventory: async () => {
         const response = await fetch(`${API_BASE_URL}/api/inventory`)
@@ -74,7 +69,6 @@ export const inventoryAPI = {
     }
 }
 
-// Command API endpoints
 export const commandAPI = {
     createCommand: async (type, sessionId = null) => {
         const body = { type }
